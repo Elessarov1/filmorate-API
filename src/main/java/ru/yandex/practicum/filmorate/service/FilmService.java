@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Comparator;
 import java.util.List;
@@ -13,10 +14,12 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
     private final FilmStorage storage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage storage) {
+    public FilmService(FilmStorage storage, UserStorage userStorage) {
         this.storage = storage;
+        this.userStorage = userStorage;
     }
 
     public List<Film> getAllFilms() {
@@ -40,8 +43,11 @@ public class FilmService {
     }
 
     public boolean addLike(int userId, int filmId) {
-        Film film = storage.get(filmId);
-        return film.addLike(userId);
+        if(!(userStorage.get(userId) == null)) {
+            Film film = storage.get(filmId);
+            return film.addLike(userId);
+        }
+        throw new NotFoundException("Invalid user id");
     }
 
     public boolean deleteLike(int userId, int filmId) {
