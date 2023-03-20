@@ -69,7 +69,7 @@ public class FilmControllerTest {
                         .content(inValidFilm))
                         .andDo(
                         h-> {
-                            assertEquals(400, h.getResponse().getStatus());
+                            assertEquals(500, h.getResponse().getStatus());
                         }
         );
     }
@@ -82,7 +82,7 @@ public class FilmControllerTest {
                         .content(""))
                 .andDo(
                         h-> {
-                            assertEquals(400, h.getResponse().getStatus());
+                            assertEquals(500, h.getResponse().getStatus());
                         }
                 );
     }

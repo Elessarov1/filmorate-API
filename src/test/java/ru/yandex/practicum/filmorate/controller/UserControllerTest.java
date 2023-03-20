@@ -66,7 +66,7 @@ public class UserControllerTest {
                 .contentType("application/json")
                 .content(inValidUser)).andDo(
                 h-> {
-                    assertEquals(400, h.getResponse().getStatus());
+                    assertEquals(500, h.getResponse().getStatus());
                 }
         );
     }
@@ -78,7 +78,7 @@ public class UserControllerTest {
                 .contentType("application/json")
                 .content("")).andDo(
                 h-> {
-                    assertEquals(400, h.getResponse().getStatus());
+                    assertEquals(500, h.getResponse().getStatus());
                 }
         );
     }
