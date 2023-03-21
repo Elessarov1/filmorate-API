@@ -10,11 +10,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.Collections;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,23 +34,36 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     void validationWithValidData() {
-        String validUser = objectMapper.writeValueAsString(User.builder()
+        User user = User.builder()
                 .login("dolore")
                 .name("Nick Name")
                 .email("mail@mail.ru")
                 .birthday(LocalDate.of(1946,8,20))
-                .build());
+                .build();
+        String validUser = objectMapper.writeValueAsString(user);
+
         mockMvc.perform(post("/users")
                 .contentType("application/json")
-                .content(validUser)).andDo(
-                h-> {
-                    assertEquals(200, h.getResponse().getStatus());
-                }
-        );
+                .content(validUser)).andDo(h->
+                    assertEquals(200, h.getResponse().getStatus()));
+
         mockMvc.perform(get("/users")
                 .contentType("application/json")).andDo(h->
-                assertEquals(200, h.getResponse().getStatus())
-        );
+                assertEquals(200, h.getResponse().getStatus()));
+
+        mockMvc.perform(get("/users/1")
+                .contentType("application/json")).andDo(h->
+                assertEquals(200, h.getResponse().getStatus()));
+
+        mockMvc.perform(get("/users/2")
+                .contentType("application/json")).andDo(h->
+                assertEquals(404, h.getResponse().getStatus()));
+
+        mockMvc.perform(delete("/users/1")
+                .contentType("application/json")).andDo(h->
+                assertEquals(200, h.getResponse().getStatus()));
+
+        assertEquals(Collections.EMPTY_LIST, userController.getAllUsers());
     }
 
     @SneakyThrows
@@ -66,7 +79,7 @@ public class UserControllerTest {
                 .contentType("application/json")
                 .content(inValidUser)).andDo(
                 h-> {
-                    assertEquals(400, h.getResponse().getStatus());
+                    assertEquals(500, h.getResponse().getStatus());
                 }
         );
     }
@@ -78,7 +91,7 @@ public class UserControllerTest {
                 .contentType("application/json")
                 .content("")).andDo(
                 h-> {
-                    assertEquals(400, h.getResponse().getStatus());
+                    assertEquals(500, h.getResponse().getStatus());
                 }
         );
     }

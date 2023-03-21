@@ -7,6 +7,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -19,4 +21,13 @@ public class User {
     private final String email;
     @PastOrPresent
     private final LocalDate birthday;
+    private final Set<Integer> friends = new HashSet<>();
+
+    public boolean addFriend(int id) {
+        return friends.add(id);
+    }
+
+    public boolean deleteFriend(int id) {
+        return friends.remove(id);
+    }
 }
