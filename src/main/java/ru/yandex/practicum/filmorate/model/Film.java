@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,16 +13,20 @@ import java.util.Set;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class Film {
     private int id;
     @NotBlank
     private final String name;
     @Size(min = 1, max = 200)
     private final String description;
-    private final LocalDate releaseDate;
     @Positive
     private final int duration;
+    private final LocalDate releaseDate;
+
+    private final Mpa mpa;
     private final Set<Integer> likes = new HashSet<>();
+    private final Set<Genre> genres = new HashSet<>();
 
     public boolean addLike(int id) {
         return likes.add(id);
@@ -31,7 +36,16 @@ public class Film {
         return likes.remove(id);
     }
 
+    public boolean addGenre(Genre genre) {
+        return genres.add(genre);
+    }
+
+    public boolean deleteGenre(Genre genre) {
+        return genres.remove(genre);
+    }
+
     public int getLikesCount() {
         return likes.size();
     }
+
 }
