@@ -10,31 +10,30 @@ Template repository for Filmorate project.
 + Get users friends
 + Get common friends
 + Check friendship status
-+ etc
 ### Film:
 + Get all films
 + Get film by ID
 + Get film genre
 + Get most popular films
 + Get film likes
-+ etc
 
 ## Examples
 Get user friends
 ```postgres-psql
-SELECT *
-FROM user
-WHERE fr.user_id = ? AND fr.frienship_status_id = ?
-JOIN friends AS fr ON user.id=fr.user_id
-JOIN frienship_status AS fs ON fr.friendship_status_id=fs.status_id
-GROUP BY fr.user_id;
+SELECT * FROM USERS 
+WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)
  ```
 
-
-Get films of a specific genre
+Get genres by film id
 ```postgres-psql
-SELECT *
-FROM film
-WHERE fg.genre_id = ? AS genre
-JOIN film_genre AS fg ON fg.film_id=film.id
-GROUP BY genre;
+SELECT * FROM GENRE 
+WHERE GENRE_ID IN 
+(SELECT GENRE_ID FROM FILM_GENRE WHERE FILM_ID = ?)
+ ```
+
+Get films of concrete genre
+```postgres-psql
+SELECT * FROM FILMS f
+JOIN FILM_GENRE fg ON f.ID = fg.FILM_ID
+WHERE fg.GENRE_ID = ?
+ ```

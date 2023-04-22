@@ -46,20 +46,12 @@ public class FilmService {
         return storage.delete(id);
     }
 
-    public boolean addLike(int userId, int filmId) {
-        if(!(userStorage.get(userId) == null)) {
-            Film film = storage.get(filmId);
-            return film.addLike(userId);
-        }
-        throw new NotFoundException("Invalid user id");
+    public boolean addLikeToFilm(int filmId, int userId) {
+        return storage.addLikeToFilm(filmId, userId);
     }
 
     public boolean deleteLike(int userId, int filmId) {
-        if (userId > 0) {
-            Film film = storage.get(filmId);
-            return film.deleteLike(userId);
-        }
-        throw new NotFoundException("Invalid user id");
+        return storage.deleteLike(filmId, userId);
     }
 
     public List<Film> getMostLikedFilms(int count) {

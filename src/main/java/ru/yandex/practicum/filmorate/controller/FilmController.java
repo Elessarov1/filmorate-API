@@ -46,7 +46,7 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public boolean addLike(@PathVariable int id, @PathVariable int userId) {
-        return filmService.addLike(userId, id);
+        return filmService.addLikeToFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")

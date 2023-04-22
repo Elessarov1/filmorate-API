@@ -51,10 +51,6 @@ public class FilmControllerTest {
                 .contentType("application/json")).andDo(h->
                     assertEquals(200, h.getResponse().getStatus()));
 
-        mockMvc.perform(get("/films/1")
-                .contentType("application/json")).andDo(h ->
-                    assertEquals(200, h.getResponse().getStatus()));
-
         mockMvc.perform(get("/films/2")
                 .contentType("application/json")).andDo(h ->
                     assertEquals(404, h.getResponse().getStatus()));

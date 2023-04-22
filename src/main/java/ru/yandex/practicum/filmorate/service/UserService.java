@@ -39,32 +39,18 @@ public class UserService {
     }
 
     public boolean addFriend(int userId, int friendId) {
-        User user = storage.get(userId);
-        User friend = storage.get(friendId);
-        user.addFriend(friendId);
-        return friend.addFriend(userId);
+        return storage.addFriend(userId,friendId);
     }
 
     public boolean deleteFriend(int userId, int friendId) {
-        User user = storage.get(userId);
-        User friend = storage.get(friendId);
-        user.deleteFriend(friendId);
-        return friend.deleteFriend(userId);
+        return storage.deleteFriend(userId,friendId);
     }
 
     public List<User> getAllFriends(int id) {
-        User user = storage.get(id);
-        return user.getFriends()
-                .stream()
-                .map(storage::get)
-                .collect(Collectors.toList());
+        return storage.getAllFriends(id);
     }
 
     public List<User> getCommonFriends(int userId, int otherId) {
-        List<User> userFriends = getAllFriends(userId);
-        List<User> otherUserFriends = getAllFriends(otherId);
-        List<User> commonFriends = new ArrayList<>(userFriends);
-        commonFriends.retainAll(otherUserFriends);
-        return commonFriends;
+        return storage.getCommonFriends(userId,otherId);
     }
 }
