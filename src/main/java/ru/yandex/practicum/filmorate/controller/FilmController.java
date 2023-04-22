@@ -31,7 +31,7 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-       return filmService.addFilm(film);
+        return filmService.addFilm(film);
     }
 
     @PutMapping
@@ -56,6 +56,6 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10", required = false) @PathVariable int count) {
-            return filmService.getMostLikedFilms(count);
+        return filmService.getMostLikedFilms(count);
     }
 }

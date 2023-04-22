@@ -13,13 +13,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 @Slf4j
 @Component
 @Qualifier("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
-    private int filmId = 1;
     private final HashMap<Integer, Film> films = new HashMap<>();
     private final UserStorage userStorage = new InMemoryUserStorage();
+    private int filmId = 1;
 
     @Override
     public Film add(Film film) {
@@ -57,12 +58,12 @@ public class InMemoryFilmStorage implements FilmStorage {
             return films.get(id);
         }
         log.warn("Film doesn't exist");
-       throw new NotFoundException("Film doesn't exist");
+        throw new NotFoundException("Film doesn't exist");
     }
 
     @Override
     public boolean addLikeToFilm(int filmId, int userId) {
-        if(!(userStorage.get(userId) == null)) {
+        if (!(userStorage.get(userId) == null)) {
             Film film = films.get(filmId);
             return true;
         }
@@ -84,7 +85,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     private void validateFilm(Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.info("The date is incorrect");
             throw new ValidationException("invalid release date");
         }

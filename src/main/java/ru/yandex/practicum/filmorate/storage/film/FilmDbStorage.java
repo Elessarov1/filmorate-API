@@ -28,35 +28,35 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film add(Film film) {
-            SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-            validateFilm(film);
-            Number key = jdbcInsert.withTableName("FILM")
-                    .usingGeneratedKeyColumns("ID")
-                    .executeAndReturnKey(getFilmFields(film));
-            film.setId(key.intValue());
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        validateFilm(film);
+        Number key = jdbcInsert.withTableName("FILM")
+                .usingGeneratedKeyColumns("ID")
+                .executeAndReturnKey(getFilmFields(film));
+        film.setId(key.intValue());
 
-            jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-            List<Map<String, Object>> batchValues = new ArrayList<>();
-            for (Genre genre : film.getGenres()) {
-                Map<String, Object> parameters = new HashMap<>();
-                parameters.put("FILM_ID", film.getId());
-                parameters.put("GENRE_ID", genre.getId());
-                batchValues.add(parameters);
-            }
-            jdbcInsert.withTableName("FILM_GENRE")
-                    .executeBatch(batchValues.toArray(new Map[batchValues.size()]));
-            batchValues.clear();
+        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        List<Map<String, Object>> batchValues = new ArrayList<>();
+        for (Genre genre : film.getGenres()) {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("FILM_ID", film.getId());
+            parameters.put("GENRE_ID", genre.getId());
+            batchValues.add(parameters);
+        }
+        jdbcInsert.withTableName("FILM_GENRE")
+                .executeBatch(batchValues.toArray(new Map[batchValues.size()]));
+        batchValues.clear();
 
-            jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-            for (Integer like : film.getLikes()) {
-                Map<String, Object> parameters = new HashMap<>();
-                parameters.put("FILM_ID", film.getId());
-                parameters.put("USER_ID", like);
-                batchValues.add(parameters);
-            }
-            jdbcInsert.withTableName("LIKES")
-                    .executeBatch(batchValues.toArray(new Map[batchValues.size()]));
-            return film;
+        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        for (Integer like : film.getLikes()) {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("FILM_ID", film.getId());
+            parameters.put("USER_ID", like);
+            batchValues.add(parameters);
+        }
+        jdbcInsert.withTableName("LIKES")
+                .executeBatch(batchValues.toArray(new Map[batchValues.size()]));
+        return film;
     }
 
     @Override
@@ -126,7 +126,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public boolean addLikeToFilm(int filmId, int userId) {
         String sql = "INSERT INTO LIKES (FILM_ID, USER_ID) VALUES(?,?)";
-        return jdbcTemplate.update(sql, filmId,userId) > 0;
+        return jdbcTemplate.update(sql, filmId, userId) > 0;
     }
 
     @Override
@@ -186,11 +186,13 @@ public class FilmDbStorage implements FilmStorage {
         }
         return res;
     }
+
     private void validateFilm(Film film) throws ValidationException {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("invalid release date");
         }
     }
+
     private boolean removeOldGenres(int filmId) {
         String sql = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
         return jdbcTemplate.update(sql, filmId) > 0;

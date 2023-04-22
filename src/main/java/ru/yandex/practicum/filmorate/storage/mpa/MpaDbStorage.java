@@ -15,6 +15,7 @@ import java.util.List;
 public class MpaDbStorage implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public List<Mpa> getAllMpa() {
         String sql = "SELECT * FROM MPA";

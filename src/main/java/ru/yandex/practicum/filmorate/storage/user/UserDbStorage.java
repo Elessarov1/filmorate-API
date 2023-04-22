@@ -94,12 +94,12 @@ public class UserDbStorage implements UserStorage {
             updatedRows = jdbcTemplate.update(sql, "TRUE", userId, friendId);
         } else {
             String sql = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, FRIENDSHIP_STATUS) VALUES (?,?,?)";
-            updatedRows = jdbcTemplate.update(sql,userId,friendId, "FALSE");
+            updatedRows = jdbcTemplate.update(sql, userId, friendId, "FALSE");
         }
-            if (updatedRows > 0) {
-                return true;
-            }
-            throw new NotFoundException("No such users in the database");
+        if (updatedRows > 0) {
+            return true;
+        }
+        throw new NotFoundException("No such users in the database");
     }
 
     @Override
@@ -110,8 +110,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAllFriends(int id) {
-            String sql = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
-            return jdbcTemplate.query(sql, this::mapRowToUser, id);
+        String sql = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
+        return jdbcTemplate.query(sql, this::mapRowToUser, id);
     }
 
     @Override
@@ -146,6 +146,7 @@ public class UserDbStorage implements UserStorage {
         user.getFriends().addAll(getFriendsByUserId(resultSet.getInt("ID")));
         return user;
     }
+
     private Set<Integer> getFriendsByUserId(int id) {
         String sql = "SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, id);
@@ -163,17 +164,19 @@ public class UserDbStorage implements UserStorage {
                 ps.setInt(1, user.getId());
                 ps.setObject(2, list.get(i));
             }
+
             @Override
             public int getBatchSize() {
                 return list.size();
             }
         });
     }
+
     private boolean friendCheck(int userId, int friendId) {
         if (userId < 0 || friendId < 0) {
             throw new NotFoundException("Invalid Data");
         }
         String sql = "SELECT COUNT(*) FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[] {userId, friendId}, Integer.class) > 0;
+        return jdbcTemplate.queryForObject(sql, new Object[]{userId, friendId}, Integer.class) > 0;
     }
 }

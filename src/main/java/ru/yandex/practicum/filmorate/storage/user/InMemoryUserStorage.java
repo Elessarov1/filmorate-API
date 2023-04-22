@@ -14,8 +14,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
-    private int userId = 1;
     private final HashMap<Integer, User> users = new HashMap<>();
+    private int userId = 1;
+
     @Override
     public User add(User user) {
         validateUser(user);
@@ -93,6 +94,7 @@ public class InMemoryUserStorage implements UserStorage {
         commonFriends.retainAll(otherUserFriends);
         return commonFriends;
     }
+
     private void validateUser(User user) throws ValidationException {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());

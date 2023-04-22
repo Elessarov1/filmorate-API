@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -29,55 +28,50 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
 
-    private final UserDbStorage userStorage;
-
-    private final FilmDbStorage filmStorage;
-
-    private final GenreDbStorage genreStorage;
-
-    private final MpaDbStorage mpaStorage;
-
     private static User user1;
     private static User user2;
-
     private static Film film1;
     private static Film film2;
+    private final UserDbStorage userStorage;
+    private final FilmDbStorage filmStorage;
+    private final GenreDbStorage genreStorage;
+    private final MpaDbStorage mpaStorage;
 
     @BeforeAll
     static void beforeAll() {
-         user1 = User.builder()
+        user1 = User.builder()
                 .id(1)
                 .name("Tom")
                 .login("tom")
                 .email("example@gmail.com")
-                .birthday(LocalDate.of(1946,8,20))
+                .birthday(LocalDate.of(1946, 8, 20))
                 .build();
 
-         user2 = User.builder()
-                 .id(2)
-                 .name("Dan")
-                 .login("dan")
-                 .email("example@gmail.com")
-                 .birthday(LocalDate.of(1987,3,15))
-                 .build();
+        user2 = User.builder()
+                .id(2)
+                .name("Dan")
+                .login("dan")
+                .email("example@gmail.com")
+                .birthday(LocalDate.of(1987, 3, 15))
+                .build();
 
-         film1 = Film.builder()
-                 .id(1)
-                 .name("nisi eiusmod")
-                 .description("adipisicing")
-                 .releaseDate(LocalDate.of(1967, 3,25))
-                 .duration(100)
-                 .mpa(new Mpa(1, "G"))
-                 .build();
+        film1 = Film.builder()
+                .id(1)
+                .name("nisi eiusmod")
+                .description("adipisicing")
+                .releaseDate(LocalDate.of(1967, 3, 25))
+                .duration(100)
+                .mpa(new Mpa(1, "G"))
+                .build();
 
-         film2 = Film.builder()
-                 .id(2)
-                 .name("Titanic")
-                 .description("description")
-                 .releaseDate(LocalDate.of(2000, 5,20))
-                 .duration(120)
-                 .mpa(new Mpa(2, "PG"))
-                 .build();
+        film2 = Film.builder()
+                .id(2)
+                .name("Titanic")
+                .description("description")
+                .releaseDate(LocalDate.of(2000, 5, 20))
+                .duration(120)
+                .mpa(new Mpa(2, "PG"))
+                .build();
     }
 
     @BeforeEach

@@ -38,29 +38,29 @@ public class UserControllerTest {
                 .login("dolore")
                 .name("Nick Name")
                 .email("mail@mail.ru")
-                .birthday(LocalDate.of(1946,8,20))
+                .birthday(LocalDate.of(1946, 8, 20))
                 .build();
         String validUser = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(post("/users")
                 .contentType("application/json")
-                .content(validUser)).andDo(h->
-                    assertEquals(200, h.getResponse().getStatus()));
+                .content(validUser)).andDo(h ->
+                assertEquals(200, h.getResponse().getStatus()));
 
         mockMvc.perform(get("/users")
-                .contentType("application/json")).andDo(h->
+                .contentType("application/json")).andDo(h ->
                 assertEquals(200, h.getResponse().getStatus()));
 
         mockMvc.perform(get("/users/1")
-                .contentType("application/json")).andDo(h->
+                .contentType("application/json")).andDo(h ->
                 assertEquals(200, h.getResponse().getStatus()));
 
         mockMvc.perform(get("/users/2")
-                .contentType("application/json")).andDo(h->
+                .contentType("application/json")).andDo(h ->
                 assertEquals(404, h.getResponse().getStatus()));
 
         mockMvc.perform(delete("/users/1")
-                .contentType("application/json")).andDo(h->
+                .contentType("application/json")).andDo(h ->
                 assertEquals(200, h.getResponse().getStatus()));
 
         assertEquals(Collections.EMPTY_LIST, userController.getAllUsers());
@@ -73,12 +73,12 @@ public class UserControllerTest {
                 .login("dolore")
                 .name("Nick Name")
                 .email("mail.ru") // неверный формат
-                .birthday(LocalDate.of(1980,8,20))
+                .birthday(LocalDate.of(1980, 8, 20))
                 .build());
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content(inValidUser)).andDo(
-                h-> {
+                h -> {
                     assertEquals(500, h.getResponse().getStatus());
                 }
         );
@@ -90,7 +90,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                 .contentType("application/json")
                 .content("")).andDo(
-                h-> {
+                h -> {
                     assertEquals(500, h.getResponse().getStatus());
                 }
         );
@@ -100,7 +100,7 @@ public class UserControllerTest {
     @Test
     void validationWithWrongURI() {
         mockMvc.perform(get("/user")
-                .contentType("application/json")).andDo(h->
+                .contentType("application/json")).andDo(h ->
                 assertEquals(404, h.getResponse().getStatus())
         );
     }
