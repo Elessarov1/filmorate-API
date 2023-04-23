@@ -1,20 +1,26 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 @Slf4j
 @Component
+@Qualifier("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
-    private int filmId = 1;
     private final HashMap<Integer, Film> films = new HashMap<>();
+    private final UserStorage userStorage = new InMemoryUserStorage();
+    private int filmId = 1;
 
     @Override
     public Film add(Film film) {
@@ -52,7 +58,25 @@ public class InMemoryFilmStorage implements FilmStorage {
             return films.get(id);
         }
         log.warn("Film doesn't exist");
-       throw new NotFoundException("Film doesn't exist");
+        throw new NotFoundException("Film doesn't exist");
+    }
+
+    @Override
+    public boolean addLikeToFilm(int filmId, int userId) {
+        if (!(userStorage.get(userId) == null)) {
+            Film film = films.get(filmId);
+            return true;
+        }
+        throw new NotFoundException("Invalid user id");
+    }
+
+    @Override
+    public boolean deleteLike(int filmId, int userId) {
+        if (userId > 0) {
+            Film film = films.get(filmId);
+            return true;
+        }
+        throw new NotFoundException("Invalid user id");
     }
 
     @Override
@@ -61,7 +85,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     private void validateFilm(Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.info("The date is incorrect");
             throw new ValidationException("invalid release date");
         }

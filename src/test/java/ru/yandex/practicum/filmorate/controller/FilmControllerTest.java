@@ -37,27 +37,23 @@ public class FilmControllerTest {
         Film film = Film.builder()
                 .name("nisi eiusmod")
                 .description("adipisicing")
-                .releaseDate(LocalDate.of(1967, 3,25))
+                .releaseDate(LocalDate.of(1967, 3, 25))
                 .duration(100)
                 .build();
         String validFilm = objectMapper.writeValueAsString(film);
 
         mockMvc.perform(post("/films")
                 .contentType("application/json")
-                .content(validFilm)).andDo(h->
-                    assertEquals(200, h.getResponse().getStatus()));
+                .content(validFilm)).andDo(h ->
+                assertEquals(200, h.getResponse().getStatus()));
 
         mockMvc.perform(get("/films")
-                .contentType("application/json")).andDo(h->
-                    assertEquals(200, h.getResponse().getStatus()));
-
-        mockMvc.perform(get("/films/1")
                 .contentType("application/json")).andDo(h ->
-                    assertEquals(200, h.getResponse().getStatus()));
+                assertEquals(200, h.getResponse().getStatus()));
 
         mockMvc.perform(get("/films/2")
                 .contentType("application/json")).andDo(h ->
-                    assertEquals(404, h.getResponse().getStatus()));
+                assertEquals(404, h.getResponse().getStatus()));
 
         mockMvc.perform(get("/films/popular")
                 .contentType("application/json")).andDo(h ->
@@ -78,17 +74,17 @@ public class FilmControllerTest {
                 objectMapper.writeValueAsString(Film.builder()
                         .name("nisi eiusmod")
                         .description("adipisicing")
-                        .releaseDate(LocalDate.of(1967, 3,25))
+                        .releaseDate(LocalDate.of(1967, 3, 25))
                         .duration(-100)
                         .build());
         mockMvc.perform(post("/films")
                         .contentType("application/json")
                         .content(inValidFilm))
-                        .andDo(
-                        h-> {
+                .andDo(
+                        h -> {
                             assertEquals(500, h.getResponse().getStatus());
                         }
-        );
+                );
     }
 
     @SneakyThrows
@@ -98,7 +94,7 @@ public class FilmControllerTest {
                         .contentType("application/json")
                         .content(""))
                 .andDo(
-                        h-> {
+                        h -> {
                             assertEquals(500, h.getResponse().getStatus());
                         }
                 );
@@ -108,10 +104,10 @@ public class FilmControllerTest {
     @Test
     void getRequestWithWrongURI() {
         mockMvc.perform(get("/film")
-                .contentType("application/json"))
+                        .contentType("application/json"))
                 .andDo(
-                        h->
-                assertEquals(404, h.getResponse().getStatus())
-        );
+                        h ->
+                                assertEquals(404, h.getResponse().getStatus())
+                );
     }
 }

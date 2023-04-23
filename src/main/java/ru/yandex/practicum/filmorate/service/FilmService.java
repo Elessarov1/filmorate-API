@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -17,7 +17,10 @@ public class FilmService {
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage storage, UserStorage userStorage) {
+    public FilmService(
+            @Qualifier("filmDbStorage") FilmStorage storage,
+            @Qualifier("userDbStorage") UserStorage userStorage
+    ) {
         this.storage = storage;
         this.userStorage = userStorage;
     }
@@ -42,20 +45,12 @@ public class FilmService {
         return storage.delete(id);
     }
 
-    public boolean addLike(int userId, int filmId) {
-        if(!(userStorage.get(userId) == null)) {
-            Film film = storage.get(filmId);
-            return film.addLike(userId);
-        }
-        throw new NotFoundException("Invalid user id");
+    public boolean addLikeToFilm(int filmId, int userId) {
+        return storage.addLikeToFilm(filmId, userId);
     }
 
     public boolean deleteLike(int userId, int filmId) {
-        if (userId > 0) {
-            Film film = storage.get(filmId);
-            return film.deleteLike(userId);
-        }
-        throw new NotFoundException("Invalid user id");
+        return storage.deleteLike(filmId, userId);
     }
 
     public List<Film> getMostLikedFilms(int count) {

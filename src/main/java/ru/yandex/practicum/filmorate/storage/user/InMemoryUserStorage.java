@@ -9,11 +9,14 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
-    private int userId = 1;
     private final HashMap<Integer, User> users = new HashMap<>();
+    private int userId = 1;
+
     @Override
     public User add(User user) {
         validateUser(user);
@@ -56,6 +59,40 @@ public class InMemoryUserStorage implements UserStorage {
         }
         log.warn("User doesn't exist");
         throw new NotFoundException("User doesn't exist");
+    }
+
+    @Override
+    public boolean addFriend(int userId, int friendId) {
+        User user = this.get(userId);
+        User friend = this.get(friendId);
+        user.addFriend(friendId);
+        return friend.addFriend(userId);
+    }
+
+    @Override
+    public boolean deleteFriend(int userId, int friendId) {
+        User user = this.get(userId);
+        User friend = this.get(friendId);
+        user.deleteFriend(friendId);
+        return friend.deleteFriend(userId);
+    }
+
+    @Override
+    public List<User> getAllFriends(int id) {
+        User user = this.get(id);
+        return user.getFriends()
+                .stream()
+                .map(this::get)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> getCommonFriends(int userId, int otherId) {
+        List<User> userFriends = getAllFriends(userId);
+        List<User> otherUserFriends = getAllFriends(otherId);
+        List<User> commonFriends = new ArrayList<>(userFriends);
+        commonFriends.retainAll(otherUserFriends);
+        return commonFriends;
     }
 
     private void validateUser(User user) throws ValidationException {

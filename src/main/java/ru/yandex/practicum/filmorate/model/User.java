@@ -13,15 +13,15 @@ import java.util.Set;
 @Data
 @Builder
 public class User {
-    private int id;
     @NotBlank
     private final String login;
-    private String name;
     @Email
     private final String email;
     @PastOrPresent
     private final LocalDate birthday;
     private final Set<Integer> friends = new HashSet<>();
+    private int id;
+    private String name;
 
     public boolean addFriend(int id) {
         return friends.add(id);
