@@ -1,18 +1,25 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.enums.SearchQueryArgs;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.enums.SearchQueryArgs.DIRECTOR;
+import static ru.yandex.practicum.filmorate.enums.SearchQueryArgs.TITLE;
+
+@Slf4j
 @Service
 public class FilmService {
     private final FilmStorage storage;
@@ -83,5 +90,28 @@ public class FilmService {
                 return films;
         }
         return films;
+    }
+
+    public List<Film> getByTitleOrDirector(String query, List<String> by) {
+        String lowerCaseQuery = query.toLowerCase();
+        if (by.contains(DIRECTOR.getLowerCase()) && by.contains(TITLE.getLowerCase())) {
+            return storage.findByRequestedTitleAndDirector(lowerCaseQuery);
+        }
+        String enumName = by.get(0).toUpperCase();
+        SearchQueryArgs argumentValue;
+        try {
+            argumentValue = SearchQueryArgs.valueOf(enumName);
+        } catch (IllegalArgumentException e) {
+            log.warn("Указан неверный параметр поиска: {}", enumName);
+            return Collections.emptyList();
+        }
+        switch (argumentValue) {
+            case DIRECTOR:
+                return storage.findByRequestedDirector(lowerCaseQuery);
+            case TITLE:
+                return storage.findByRequestedTitle(lowerCaseQuery);
+            default:
+                return Collections.emptyList();
+        }
     }
 }
