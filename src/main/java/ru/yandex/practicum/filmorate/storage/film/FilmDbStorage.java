@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.sql.FilmStorageSql.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Repository
@@ -161,6 +163,20 @@ public class FilmDbStorage implements FilmStorage {
                 "JOIN FILM_DIRECTOR AS fd ON f.ID = fd.FILM_ID " +
                 "WHERE fd.DIRECTOR_ID = ?";
         return jdbcTemplate.query(sql, this::mapRowToFilm, directorId);
+    }
+    @Override
+    public List<Film> findByRequestedDirector(String query) {
+        return jdbcTemplate.query(FIND_BY_REQUESTED_DIRECTOR.getSql(), this::mapRowToFilm, query);
+    }
+
+    @Override
+    public List<Film> findByRequestedTitle(String query) {
+        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE.getSql(), this::mapRowToFilm, query);
+    }
+
+    @Override
+    public List<Film> findByRequestedTitleAndDirector(String query) {
+        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE_AND_DIRECTOR.getSql(), this::mapRowToFilm, query, query);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
