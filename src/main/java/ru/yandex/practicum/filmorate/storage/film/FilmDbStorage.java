@@ -48,9 +48,7 @@ public class FilmDbStorage implements FilmStorage {
                 .executeBatch(batchValues.toArray(new Map[batchValues.size()]));
         batchValues.clear();
 
-        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-        addDirectors(film, jdbcInsert, batchValues);
-        batchValues.clear();
+        addDirectors(film);
 
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         for (Integer like : film.getLikes()) {
@@ -104,10 +102,9 @@ public class FilmDbStorage implements FilmStorage {
                 .collect(Collectors.toList());
 
         if (!directorIds.isEmpty()) {
-            SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-            List<Map<String, Object>> batchValues = new ArrayList<>();
-            addDirectors(film, jdbcInsert, batchValues);
+            addDirectors(film);
         }
+
         return get(filmId);
     }
 
@@ -153,6 +150,17 @@ public class FilmDbStorage implements FilmStorage {
         }
         String sql = "DELETE FROM LIKES WHERE FILM_ID AND USER_ID IN(?,?)";
         return jdbcTemplate.update(sql, filmId, userId) > 0;
+    }
+
+    @Override
+    public List<Film> getFilmsByDirector(int directorId) {
+        String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.DURATION, f.RELEASE_DATE, " +
+                "f.MPA_ID, m.NAME " +
+                "FROM FILM AS f " +
+                "JOIN MPA AS m ON f.MPA_ID = m.MPA_ID " +
+                "JOIN FILM_DIRECTOR AS fd ON f.ID = fd.FILM_ID " +
+                "WHERE fd.DIRECTOR_ID = ?";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, directorId);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -230,9 +238,10 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.update(sql, filmId) > 0;
     }
 
-    private void addDirectors(Film film,
-                              SimpleJdbcInsert jdbcInsert,
-                              List<Map<String, Object>> batchValues) {
+    private void addDirectors(Film film) {
+        List<Map<String, Object>> batchValues = new ArrayList<>();
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+
         for (Director director : film.getDirectors()) {
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("DIRECTOR_ID", director.getId());

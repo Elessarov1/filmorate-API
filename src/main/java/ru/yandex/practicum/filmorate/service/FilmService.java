@@ -63,6 +63,15 @@ public class FilmService {
     }
 
     public List<Film> getFilmsByDirector(int directorId, String sortBy) {
-        return null;
+        List<Film> films = storage.getFilmsByDirector(directorId);
+        switch (sortBy) {
+            case "year":
+                films.sort(Comparator.comparingInt(f -> f.getReleaseDate().getYear()));
+                break;
+            case "likes":
+                films.sort(Comparator.comparing(Film::getLikesCount));
+                break;
+        }
+        return films;
     }
 }

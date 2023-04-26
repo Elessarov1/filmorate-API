@@ -18,4 +18,6 @@ public interface FilmStorage {
     boolean addLikeToFilm(int filmId, int userId);
 
     boolean deleteLike(int filmId, int userId);
+
+    List<Film> getFilmsByDirector(int directorId);
 }
