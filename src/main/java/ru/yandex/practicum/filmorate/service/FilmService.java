@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,5 +84,23 @@ public class FilmService {
                 return films;
         }
         return films;
+    }
+
+    public List<Film> getByTitleOrDirector(String query, String[] by) {
+        int titleAndDirectorArgs = 2;
+        String lowerCaseQuery = query.toLowerCase();
+        String argumentValue = by[0];
+
+        if (by.length == titleAndDirectorArgs) {
+            return storage.findByRequestedTitleAndDirector(lowerCaseQuery);
+        }
+        switch (argumentValue) {
+            case "director":
+                return storage.findByRequestedDirector(lowerCaseQuery);
+            case "title":
+                return storage.findByRequestedTitle(lowerCaseQuery);
+            default:
+                return Collections.emptyList();
+        }
     }
 }
