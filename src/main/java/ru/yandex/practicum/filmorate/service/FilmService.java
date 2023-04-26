@@ -61,4 +61,21 @@ public class FilmService {
                 .limit(count)
                 .collect(Collectors.toList());
     }
+
+    public List<Film> getFilmsByDirector(int directorId, String sortBy) {
+        return storage.getAllFilms().stream()
+                .filter(film -> film.getDirector().getId() == directorId)
+                .sorted((f1, f2) -> {
+                    int comp = 0;
+                    switch (sortBy) {
+                        case("year"):
+                            comp = Integer.compare(f1.getReleaseDate().getYear(), f2.getReleaseDate().getYear());
+                            break;
+                        case("likes"):
+                            comp = Integer.compare(f1.getLikesCount(), f2.getLikesCount());
+                            break;
+                    }
+                    return comp;
+                }).collect(Collectors.toList());
+    }
 }
