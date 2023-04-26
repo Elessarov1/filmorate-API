@@ -159,6 +159,7 @@ public class FilmDbStorage implements FilmStorage {
         fields.put("DESCRIPTION", film.getDescription());
         fields.put("DURATION", film.getDuration());
         fields.put("RELEASE_DATE", film.getReleaseDate());
+        fields.put("DIRECTOR_ID", film.getDirector().getId());
         if (film.getMpa() != null) {
             fields.put("MPA_ID", film.getMpa().getId());
         }
