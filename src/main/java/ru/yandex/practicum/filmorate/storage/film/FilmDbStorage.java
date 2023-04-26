@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -62,14 +63,15 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         int filmId = film.getId();
-        String sqlQuery = "UPDATE FILM SET NAME = ?, DESCRIPTION = ?, DURATION = ?, RELEASE_DATE = ?, MPA_ID = ? " +
-                "WHERE ID = ?";
+        String sqlQuery = "UPDATE FILM SET NAME = ?, DESCRIPTION = ?, DURATION = ?, " +
+                "RELEASE_DATE = ?, MPA_ID = ?, DIRECTOR_ID = ? WHERE ID = ?";
         int rowsUpdated = jdbcTemplate.update(sqlQuery,
                 film.getName(),
                 film.getDescription(),
                 film.getDuration(),
                 film.getReleaseDate(),
                 film.getMpa().getId(),
+                film.getDirector().getId(),
                 filmId
         );
         if (rowsUpdated == 0) {
@@ -98,9 +100,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        String sqlQuery = "SELECT f.ID,f.NAME,f.DESCRIPTION,f.DURATION, f.RELEASE_DATE,f.MPA_ID,m.NAME AS MPA_NAME " +
+        String sqlQuery = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.DURATION, f.RELEASE_DATE," +
+                "f.MPA_ID, m.NAME AS MPA_NAME, f.DIRECTOR_ID, d.DIRECTOR_NAME " +
                 "FROM FILM AS f " +
-                "JOIN MPA AS m ON f.MPA_ID = m.MPA_ID ";
+                "JOIN MPA AS m ON f.MPA_ID = m.MPA_ID " +
+                "JOIN DIRECTOR d on d.DIRECTOR_ID = f.DIRECTOR_ID";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
@@ -112,9 +116,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film get(int id) {
-        String sqlQuery = "SELECT f.ID,f.NAME,f.DESCRIPTION,f.DURATION, f.RELEASE_DATE,f.MPA_ID,m.NAME AS MPA_NAME " +
+        String sqlQuery = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.DURATION, f.RELEASE_DATE, " +
+                "f.MPA_ID, m.NAME AS MPA_NAME, f.DIRECTOR_ID, d.DIRECTOR_NAME " +
                 "FROM FILM AS f " +
                 "JOIN MPA AS m ON f.MPA_ID = m.MPA_ID " +
+                "JOIN DIRECTOR AS d ON d.DIRECTOR_ID = f.DIRECTOR_ID " +
                 "WHERE ID = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
@@ -138,7 +144,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.update(sql, filmId, userId) > 0;
     }
 
-
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = Film.builder()
                 .id(resultSet.getInt("ID"))
@@ -147,6 +152,7 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(resultSet.getInt("DURATION"))
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
                 .mpa(new Mpa(resultSet.getInt("MPA_ID"), resultSet.getString("MPA_NAME")))
+                .director(new Director(resultSet.getInt("DIRECTOR_ID"), resultSet.getString("DIRECTOR_NAME")))
                 .build();
         film.getGenres().addAll(getGenresByFilmId(film.getId()));
         film.getLikes().addAll(getLikesByFilmId(film.getId()));
@@ -159,7 +165,9 @@ public class FilmDbStorage implements FilmStorage {
         fields.put("DESCRIPTION", film.getDescription());
         fields.put("DURATION", film.getDuration());
         fields.put("RELEASE_DATE", film.getReleaseDate());
-        fields.put("DIRECTOR_ID", film.getDirector().getId());
+        if (film.getDirector() != null) {
+            fields.put("DIRECTOR_ID", film.getDirector().getId());
+        }
         if (film.getMpa() != null) {
             fields.put("MPA_ID", film.getMpa().getId());
         }
