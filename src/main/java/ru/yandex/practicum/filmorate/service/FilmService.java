@@ -5,13 +5,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.sql.SearchQueryArgs;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.yandex.practicum.filmorate.sql.SearchQueryArgs.DIRECTOR;
+import static ru.yandex.practicum.filmorate.sql.SearchQueryArgs.TITLE;
 
 @Service
 public class FilmService {
@@ -83,5 +88,22 @@ public class FilmService {
                 return films;
         }
         return films;
+    }
+
+    public List<Film> getByTitleOrDirector(String query, List<String> by) {
+        String lowerCaseQuery = query.toLowerCase();
+        if (by.contains(DIRECTOR.toString()) && by.contains(TITLE.toString())) {
+            return storage.findByRequestedTitleAndDirector(lowerCaseQuery);
+        }
+        String enumName = by.get(0).toUpperCase();
+        SearchQueryArgs argumentValue = SearchQueryArgs.valueOf(enumName);
+        switch (argumentValue) {
+            case DIRECTOR:
+                return storage.findByRequestedDirector(lowerCaseQuery);
+            case TITLE:
+                return storage.findByRequestedTitle(lowerCaseQuery);
+            default:
+                return Collections.emptyList();
+        }
     }
 }
