@@ -24,7 +24,7 @@ public class Film {
     private final int duration;
     private final LocalDate releaseDate;
     private final Mpa mpa;
-    private final Director director;
+    private final Set<Director> directors = new HashSet<>();
     private final Set<Integer> likes = new HashSet<>();
     private final Set<Genre> genres = new HashSet<>();
 

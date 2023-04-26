@@ -49,6 +49,10 @@ public class FilmDbStorage implements FilmStorage {
         batchValues.clear();
 
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        addDirectors(film, jdbcInsert, batchValues);
+        batchValues.clear();
+
+        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         for (Integer like : film.getLikes()) {
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("FILM_ID", film.getId());
@@ -64,14 +68,13 @@ public class FilmDbStorage implements FilmStorage {
     public Film update(Film film) {
         int filmId = film.getId();
         String sqlQuery = "UPDATE FILM SET NAME = ?, DESCRIPTION = ?, DURATION = ?, " +
-                "RELEASE_DATE = ?, MPA_ID = ?, DIRECTOR_ID = ? WHERE ID = ?";
+                "RELEASE_DATE = ?, MPA_ID = ? WHERE ID = ?";
         int rowsUpdated = jdbcTemplate.update(sqlQuery,
                 film.getName(),
                 film.getDescription(),
                 film.getDuration(),
                 film.getReleaseDate(),
                 film.getMpa().getId(),
-                film.getDirector().getId(),
                 filmId
         );
         if (rowsUpdated == 0) {
@@ -94,17 +97,26 @@ public class FilmDbStorage implements FilmStorage {
             jdbcInsert.withTableName("FILM_GENRE")
                     .executeBatch(batchValues.toArray(new Map[batchValues.size()]));
         }
+
+        removeDirectors(filmId);
+        List<Integer> directorIds = film.getDirectors().stream()
+                .map(Director::getId)
+                .collect(Collectors.toList());
+
+        if (!directorIds.isEmpty()) {
+            SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+            List<Map<String, Object>> batchValues = new ArrayList<>();
+            addDirectors(film, jdbcInsert, batchValues);
+        }
         return get(filmId);
     }
-
 
     @Override
     public List<Film> getAllFilms() {
         String sqlQuery = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.DURATION, f.RELEASE_DATE," +
-                "f.MPA_ID, m.NAME AS MPA_NAME, f.DIRECTOR_ID, d.DIRECTOR_NAME " +
+                "f.MPA_ID, m.NAME AS MPA_NAME " +
                 "FROM FILM AS f " +
-                "JOIN MPA AS m ON f.MPA_ID = m.MPA_ID " +
-                "JOIN DIRECTOR d on d.DIRECTOR_ID = f.DIRECTOR_ID";
+                "JOIN MPA AS m ON f.MPA_ID = m.MPA_ID";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
@@ -117,10 +129,9 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film get(int id) {
         String sqlQuery = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.DURATION, f.RELEASE_DATE, " +
-                "f.MPA_ID, m.NAME AS MPA_NAME, f.DIRECTOR_ID, d.DIRECTOR_NAME " +
+                "f.MPA_ID, m.NAME AS MPA_NAME " +
                 "FROM FILM AS f " +
                 "JOIN MPA AS m ON f.MPA_ID = m.MPA_ID " +
-                "JOIN DIRECTOR AS d ON d.DIRECTOR_ID = f.DIRECTOR_ID " +
                 "WHERE ID = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
@@ -152,10 +163,10 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(resultSet.getInt("DURATION"))
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
                 .mpa(new Mpa(resultSet.getInt("MPA_ID"), resultSet.getString("MPA_NAME")))
-                .director(new Director(resultSet.getInt("DIRECTOR_ID"), resultSet.getString("DIRECTOR_NAME")))
                 .build();
         film.getGenres().addAll(getGenresByFilmId(film.getId()));
         film.getLikes().addAll(getLikesByFilmId(film.getId()));
+        film.getDirectors().addAll(getDirectorsByFilmId(film.getId()));
         return film;
     }
 
@@ -165,9 +176,6 @@ public class FilmDbStorage implements FilmStorage {
         fields.put("DESCRIPTION", film.getDescription());
         fields.put("DURATION", film.getDuration());
         fields.put("RELEASE_DATE", film.getReleaseDate());
-        if (film.getDirector() != null) {
-            fields.put("DIRECTOR_ID", film.getDirector().getId());
-        }
         if (film.getMpa() != null) {
             fields.put("MPA_ID", film.getMpa().getId());
         }
@@ -184,6 +192,16 @@ public class FilmDbStorage implements FilmStorage {
                 .id(resultSet.getInt("GENRE_ID"))
                 .name(resultSet.getString("GENRE_NAME"))
                 .build();
+    }
+
+    private List<Director> getDirectorsByFilmId(int id) {
+        String sql = "SELECT * FROM DIRECTOR " +
+                "WHERE DIRECTOR_ID IN (SELECT DIRECTOR_ID FROM FILM_DIRECTOR WHERE FILM_ID = ?)";
+        return jdbcTemplate.query(sql,
+                (rs, rowNum) -> new Director(
+                        rs.getInt("DIRECTOR_ID"),
+                        rs.getString("DIRECTOR_NAME")),
+                id);
     }
 
     private Set<Integer> getLikesByFilmId(int id) {
@@ -205,5 +223,23 @@ public class FilmDbStorage implements FilmStorage {
     private boolean removeOldGenres(int filmId) {
         String sql = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
         return jdbcTemplate.update(sql, filmId) > 0;
+    }
+
+    private boolean removeDirectors(int filmId) {
+        String sql = "DELETE FROM FILM_DIRECTOR WHERE FILM_ID = ?";
+        return jdbcTemplate.update(sql, filmId) > 0;
+    }
+
+    private void addDirectors(Film film,
+                              SimpleJdbcInsert jdbcInsert,
+                              List<Map<String, Object>> batchValues) {
+        for (Director director : film.getDirectors()) {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("DIRECTOR_ID", director.getId());
+            parameters.put("FILM_ID", film.getId());
+            batchValues.add(parameters);
+        }
+        jdbcInsert.withTableName("FILM_DIRECTOR")
+                .executeBatch(batchValues.toArray(new Map[batchValues.size()]));
     }
 }
