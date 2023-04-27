@@ -200,7 +200,7 @@ public class FilmDbStorage implements FilmStorage {
 
     public List<Film> getCommonFilms(long userId, long friendId) {
         String sqlQuery = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE , f.DURATION, f.MPA_ID, " +
-                "r.NAME, p.popularity FROM FILM AS f " +
+                "r.NAME AS MPA_NAME, p.popularity FROM FILM AS f " +
                 "JOIN LIKES l ON f.ID  = l.FILM_ID " +
                 "JOIN LIKES ls ON f.ID = ls.FILM_ID " +
                 "JOIN (SELECT FILM_ID, COUNT (FILM_ID) AS popularity " +
