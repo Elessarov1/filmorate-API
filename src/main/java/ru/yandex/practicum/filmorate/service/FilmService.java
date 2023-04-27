@@ -69,6 +69,7 @@ public class FilmService {
 
     public List<Film> getCommonFilms(long userId, long friendId) {
         return storage.getCommonFilms(userId, friendId);
+    }
 
     public List<Film> getFilmsByDirector(int directorId, String sortBy) {
         Director validDirector = directorStorage.getById(directorId);

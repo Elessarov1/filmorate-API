@@ -244,6 +244,7 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE l.USER_ID  = ? AND ls.USER_ID  = ? " +
                 "GROUP BY f.ID ORDER BY p.popularity DESC;";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, userId, friendId);
+    }
 
     private boolean removeDirectors(int filmId) {
         String sql = "DELETE FROM FILM_DIRECTOR WHERE FILM_ID = ?";
