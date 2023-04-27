@@ -197,4 +197,17 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
         return jdbcTemplate.update(sql, filmId) > 0;
     }
+
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        String sqlQuery = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.RELEASE_DATE , f.DURATION, f.MPA_ID, " +
+                "r.NAME, p.popularity FROM FILM AS f " +
+                "JOIN LIKES l ON f.ID  = l.FILM_ID " +
+                "JOIN LIKES ls ON f.ID = ls.FILM_ID " +
+                "JOIN (SELECT FILM_ID, COUNT (FILM_ID) AS popularity " +
+                "FROM LIKES GROUP BY FILM_ID) AS p ON p.FILM_ID  = f.ID " +
+                "JOIN MPA AS r ON f.MPA_ID  = r.MPA_ID " +
+                "WHERE l.USER_ID  = ? AND ls.USER_ID  = ? " +
+                "GROUP BY f.ID ORDER BY p.popularity DESC;";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, userId, friendId);
+    }
 }

@@ -96,4 +96,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         film.setId(filmId++);
         log.info("Validation successful");
     }
+
+    @Override
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        return null;
+    }
 }
