@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.event.EventDao;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
@@ -14,9 +16,12 @@ import java.util.List;
 public class UserService {
     private final UserStorage storage;
 
+    private final EventDao eventDao;
+
     @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage storage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage storage, EventDao eventDao) {
         this.storage = storage;
+        this.eventDao = eventDao;
     }
 
     public List<User> getAllUsers() {
@@ -53,5 +58,9 @@ public class UserService {
 
     public List<User> getCommonFriends(int userId, int otherId) {
         return storage.getCommonFriends(userId, otherId);
+    }
+
+    public List<Event> getFeed(int userId) {
+        return eventDao.getFeed(userId);
     }
 }

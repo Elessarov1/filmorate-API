@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Data
 @Builder
+@Schema(description = "Information about user")
 public class User {
     @NotBlank
     private final String login;

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
+@Schema(description = "Information about film")
 public class Film {
     @Size(min = 1, max = 200)
     private final String description;
