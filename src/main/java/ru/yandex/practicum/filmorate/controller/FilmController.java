@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/films")
 public class FilmController {
@@ -57,5 +56,11 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10", required = false) @PathVariable int count) {
         return filmService.getMostLikedFilms(count);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getByDirector(@PathVariable int directorId,
+                                    @RequestParam(defaultValue = "year") String sortBy) {
+        return filmService.getFilmsByDirector(directorId, sortBy);
     }
 }
