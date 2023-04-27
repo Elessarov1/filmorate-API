@@ -43,5 +43,4 @@ public class Film {
     public int getLikesCount() {
         return likes.size();
     }
-
 }
