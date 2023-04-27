@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -15,14 +17,17 @@ import java.util.stream.Collectors;
 public class FilmService {
     private final FilmStorage storage;
     private final UserStorage userStorage;
+    private final DirectorStorage directorStorage;
 
     @Autowired
     public FilmService(
             @Qualifier("filmDbStorage") FilmStorage storage,
-            @Qualifier("userDbStorage") UserStorage userStorage
+            @Qualifier("userDbStorage") UserStorage userStorage,
+            @Qualifier("directorDbStorage") DirectorStorage directorStorage
     ) {
         this.storage = storage;
         this.userStorage = userStorage;
+        this.directorStorage = directorStorage;
     }
 
     public List<Film> getAllFilms() {
@@ -63,14 +68,15 @@ public class FilmService {
     }
 
     public List<Film> getFilmsByDirector(int directorId, String sortBy) {
-        List<Film> films = storage.getFilmsByDirector(directorId);
+        Director validDirector = directorStorage.getById(directorId);
+        List<Film> films = storage.getFilmsByDirector(validDirector.getId());
         switch (sortBy) {
             case "year":
                 films.sort(Comparator.comparingInt(f -> f.getReleaseDate().getYear()));
-                break;
+                return films;
             case "likes":
                 films.sort(Comparator.comparing(Film::getLikesCount));
-                break;
+                return films;
         }
         return films;
     }

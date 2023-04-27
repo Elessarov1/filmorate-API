@@ -155,7 +155,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getFilmsByDirector(int directorId) {
         String sql = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.DURATION, f.RELEASE_DATE, " +
-                "f.MPA_ID, m.NAME " +
+                "f.MPA_ID, m.NAME AS MPA_NAME " +
                 "FROM FILM AS f " +
                 "JOIN MPA AS m ON f.MPA_ID = m.MPA_ID " +
                 "JOIN FILM_DIRECTOR AS fd ON f.ID = fd.FILM_ID " +

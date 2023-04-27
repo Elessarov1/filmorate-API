@@ -90,7 +90,7 @@ public class UserDbStorage implements UserStorage {
     public boolean addFriend(int userId, int friendId) {
         int updatedRows = 0;
         if (friendCheck(userId, friendId)) {
-            String sql = "UPDATE FRIENDS SET FRIENDSHIP = ? WHERE USER_ID = ? AND FRIEND_ID = ?";
+            String sql = "UPDATE FRIENDS SET FRIENDSHIP_STATUS = ? WHERE USER_ID = ? AND FRIEND_ID = ?";
             updatedRows = jdbcTemplate.update(sql, "TRUE", userId, friendId);
         } else {
             String sql = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, FRIENDSHIP_STATUS) VALUES (?,?,?)";

@@ -25,12 +25,12 @@ public class DirectorController {
     }
 
     @PostMapping
-    public Director addDirector(@RequestBody Director director) {
+    public Director addDirector(@Valid @RequestBody Director director) {
         return directorService.createDirector(director);
     }
 
     @PutMapping
-    public Director updateDirector(@RequestBody Director director) {
+    public Director updateDirector(@Valid @RequestBody Director director) {
         return directorService.updateDirector(director);
     }
 
