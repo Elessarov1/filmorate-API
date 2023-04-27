@@ -9,17 +9,22 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.event.EventDao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import static ru.yandex.practicum.filmorate.model.enums.EventType.LIKE;
+import static ru.yandex.practicum.filmorate.model.enums.Operation.ADD;
+import static ru.yandex.practicum.filmorate.model.enums.Operation.REMOVE;
 import static ru.yandex.practicum.filmorate.enums.FilmStorageSql.*;
 
 @Slf4j
@@ -28,6 +33,8 @@ import static ru.yandex.practicum.filmorate.enums.FilmStorageSql.*;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
+    private final EventDao eventDao;
 
     @Override
     public Film add(Film film) {
@@ -142,7 +149,18 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public boolean addLikeToFilm(int filmId, int userId) {
         String sql = "INSERT INTO LIKES (FILM_ID, USER_ID) VALUES(?,?)";
-        return jdbcTemplate.update(sql, filmId, userId) > 0;
+        if (jdbcTemplate.update(sql, filmId, userId) > 0) {
+            Event event = Event.builder()
+                    .timestamp(LocalDateTime.now())
+                    .userId(userId)
+                    .eventType(LIKE)
+                    .operation(ADD)
+                    .entityId(filmId)
+                    .build();
+            eventDao.add(event);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -151,7 +169,18 @@ public class FilmDbStorage implements FilmStorage {
             throw new NotFoundException("Invalid Data");
         }
         String sql = "DELETE FROM LIKES WHERE FILM_ID AND USER_ID IN(?,?)";
-        return jdbcTemplate.update(sql, filmId, userId) > 0;
+        if (jdbcTemplate.update(sql, filmId, userId) > 0) {
+            Event event = Event.builder()
+                    .timestamp(LocalDateTime.now())
+                    .userId(userId)
+                    .eventType(LIKE)
+                    .operation(REMOVE)
+                    .entityId(filmId)
+                    .build();
+            eventDao.add(event);
+            return true;
+        }
+        return false;
     }
 
     @Override
