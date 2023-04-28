@@ -164,6 +164,20 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE fd.DIRECTOR_ID = ?";
         return jdbcTemplate.query(sql, this::mapRowToFilm, directorId);
     }
+    @Override
+    public List<Film> findByRequestedDirector(String query) {
+        return jdbcTemplate.query(FIND_BY_REQUESTED_DIRECTOR.getSql(), this::mapRowToFilm, query);
+    }
+
+    @Override
+    public List<Film> findByRequestedTitle(String query) {
+        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE.getSql(), this::mapRowToFilm, query);
+    }
+
+    @Override
+    public List<Film> findByRequestedTitleAndDirector(String query) {
+        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE_AND_DIRECTOR.getSql(), this::mapRowToFilm, query, query);
+    }
 
     @Override
     public List<Film> findByRequestedDirector(String query) {
