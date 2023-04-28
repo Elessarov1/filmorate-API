@@ -65,13 +65,22 @@ public class FilmService {
         return storage.deleteLike(filmId, userId);
     }
 
-    public List<Film> getMostLikedFilms(int count) {
-        return getAllFilms()
-                .stream()
-                .sorted(Comparator.comparingInt(Film::getLikesCount)
-                        .reversed())
-                .limit(count)
-                .collect(Collectors.toList());
+    public List<Film> getMostLikedFilms(int count, int genreId, int year) {
+        if ((genreId == 0) && (year == 0)) {
+            return getAllFilms()
+                    .stream()
+                    .sorted(Comparator.comparingInt(Film::getLikesCount)
+                            .reversed())
+                    .limit(count)
+                    .collect(Collectors.toList());
+        }
+        if ((genreId > 0) && (year > 0)) {
+            return storage.getByGenreAndYear(count, genreId, year);
+        }
+        if ((genreId > 0) || (year > 0)) {
+            return storage.getByGenreOrYear(count, genreId, year);
+        }
+        return Collections.emptyList();
     }
 
     public List<Film> getCommonFilms(long userId, long friendId) {

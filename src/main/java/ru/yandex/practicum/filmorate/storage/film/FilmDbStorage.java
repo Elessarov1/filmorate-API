@@ -205,6 +205,16 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE_AND_DIRECTOR.getSql(), this::mapRowToFilm, query, query);
     }
 
+    @Override
+    public List<Film> getByGenreAndYear(int count, int genreId, int year) {
+        return jdbcTemplate.query(GET_BY_GENRE_AND_YEAR.getSql(), this::mapRowToFilm, genreId, year, count);
+    }
+
+    @Override
+    public List<Film> getByGenreOrYear(int count, int genreId, int year) {
+        return jdbcTemplate.query(GET_BY_GENRE_OR_YEAR.getSql(), this::mapRowToFilm, genreId, year, count);
+    }
+
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Film film = Film.builder()
                 .id(resultSet.getInt("ID"))
