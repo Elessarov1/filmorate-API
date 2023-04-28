@@ -25,7 +25,7 @@ public class FilmController {
     @GetMapping
     @Operation(summary = "Information about all films in the database")
     public List<Film> getAllFilms() {
-            return filmService.getAllFilms();
+        return filmService.getAllFilms();
     }
 
     @GetMapping("/{id}")
@@ -67,6 +67,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
+    @Operation(summary = "Get most liked films")
     public List<Film> getMostLikedFilms(
             @RequestParam(defaultValue = "10", required = false) @PathVariable int count,
             @RequestParam(defaultValue = "0") int genreId,
