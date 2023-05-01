@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
+@Hidden
 public class ErrorResponse {
     private final String error;
 
