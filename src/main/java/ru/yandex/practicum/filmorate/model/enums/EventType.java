@@ -13,8 +13,6 @@ public enum EventType {
 
     @Override
     public String toString() {
-        return "EventType{" +
-                "eventType='" + eventType + '\'' +
-                '}';
+        return eventType;
     }
 }

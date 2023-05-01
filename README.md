@@ -1,5 +1,11 @@
-# java-filmorate
+# Java-filmorate
 Template repository for Filmorate project.
+
+## Swagger UI
+For more details you can go [here](localhost:8080/swagger-ui.html) when the app is started
+and explore API from your browser 
+### It looks like this
+![](swagger.png)
 
 ## Database diagram
 ![](schema.png)

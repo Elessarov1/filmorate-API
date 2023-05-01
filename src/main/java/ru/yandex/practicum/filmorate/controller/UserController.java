@@ -55,14 +55,14 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user from the database")
-    public boolean deleteUser(@Parameter(description = "Unique user id")@PathVariable int id) {
+    public boolean deleteUser(@Parameter(description = "Unique user id") @PathVariable int id) {
         return userService.deleteUser(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     @Operation(summary = "Add another user to friends")
     public boolean addToFriends(@Parameter(description = "User making the request") @PathVariable int id,
-                                @Parameter(description = "User receiving the request")@PathVariable int friendId) {
+                                @Parameter(description = "User receiving the request") @PathVariable int friendId) {
         return userService.addFriend(id, friendId);
     }
 

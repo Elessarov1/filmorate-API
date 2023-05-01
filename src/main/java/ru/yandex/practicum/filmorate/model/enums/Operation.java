@@ -13,8 +13,6 @@ public enum Operation {
 
     @Override
     public String toString() {
-        return "Operation{" +
-                "operation='" + operation + '\'' +
-                '}';
+        return operation;
     }
 }
