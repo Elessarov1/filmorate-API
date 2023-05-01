@@ -59,6 +59,6 @@ public class UserService {
     }
 
     public List<Event> getFeed(int userId) {
-        return eventDao.getFeed(userId);
+            return eventDao.getFeed(userId);
     }
 }
