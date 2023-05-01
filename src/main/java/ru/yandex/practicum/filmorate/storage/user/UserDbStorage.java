@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.event.EventDao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -105,14 +106,14 @@ public class UserDbStorage implements UserStorage {
             String sql = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, FRIENDSHIP_STATUS) VALUES (?,?,?)";
             updatedRows = jdbcTemplate.update(sql, userId, friendId, "FALSE");
 
-            Event event = Event.builder()
-                    .timestamp(LocalDateTime.now())
-                    .userId(userId)
-                    .eventType(FRIEND)
-                    .operation(ADD)
-                    .entityId(friendId)
-                    .build();
-            eventDao.add(event);
+                Event event = Event.builder()
+                        .timestamp(System.currentTimeMillis())
+                        .userId(userId)
+                        .eventType(FRIEND)
+                        .operation(ADD)
+                        .entityId(friendId)
+                        .build();
+                eventDao.add(event);
         }
         if (updatedRows > 0) {
             return true;
@@ -124,7 +125,7 @@ public class UserDbStorage implements UserStorage {
     public boolean deleteFriend(int userId, int friendId) {
         String sql = "DELETE FROM FRIENDS WHERE USER_ID AND FRIEND_ID IN(?,?)";
         Event event = Event.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(System.currentTimeMillis())
                 .userId(userId)
                 .eventType(FRIEND)
                 .operation(REMOVE)

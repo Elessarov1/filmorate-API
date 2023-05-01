@@ -25,7 +25,12 @@ public class FilmController {
     @GetMapping
     @Operation(summary = "Information about all films in the database")
     public List<Film> getAllFilms() {
-        return filmService.getAllFilms();
+        try {
+            return filmService.getAllFilms();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @GetMapping("/{id}")
@@ -49,7 +54,7 @@ public class FilmController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete film from the database")
     public boolean deleteFilm(@Parameter(description = "Unique film id") @PathVariable int id) {
-            return filmService.deleteFilm(id);
+        return filmService.deleteFilm(id);
     }
 
     @PutMapping("/{id}/like/{userId}")

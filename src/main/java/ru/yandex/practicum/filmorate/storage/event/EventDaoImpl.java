@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.enums.Operation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class EventDaoImpl implements EventDao {
 
     @Override
     public List<Event> getFeed(int userId) {
-        String sql = "SELECT * FROM EVENTS WHERE USER_ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
+        String sql = "SELECT * FROM EVENTS WHERE USER_ID = ?";
         if (isExist(userId)) {
             return jdbcTemplate.query(sql, this::mapRowToEvent, userId);
         }
@@ -37,13 +38,13 @@ public class EventDaoImpl implements EventDao {
         int id = jdbcInsert.withTableName("EVENTS")
                 .usingGeneratedKeyColumns("EVENT_ID")
                 .executeAndReturnKey(eventFields).intValue();
-        event.setId(id);
+        event.setEventId(id);
         return event;
     }
 
     private Map<String, Object> getEventFields(Event event) {
         Map<String, Object> fields = new HashMap<>();
-        fields.put("DATE_TIME", event.getTimestamp());
+        fields.put("DATE_TIME", new Timestamp(event.getTimestamp()));
         fields.put("USER_ID", event.getUserId());
         fields.put("EVENT_TYPE", event.getEventType().name());
         fields.put("OPERATION", event.getOperation().name());
@@ -53,8 +54,8 @@ public class EventDaoImpl implements EventDao {
 
     private Event mapRowToEvent(ResultSet resultSet, int rowNum) throws SQLException {
         Event event = Event.builder()
-                .id(resultSet.getInt("EVENT_ID"))
-                .timestamp(resultSet.getTimestamp("DATE_TIME").toLocalDateTime())
+                .eventId(resultSet.getInt("EVENT_ID"))
+                .timestamp(resultSet.getTimestamp("DATE_TIME").getTime())
                 .userId(resultSet.getInt("USER_ID"))
                 .eventType(EventType.valueOf(resultSet.getString("EVENT_TYPE")))
                 .operation(Operation.valueOf(resultSet.getString("OPERATION")))
@@ -65,6 +66,6 @@ public class EventDaoImpl implements EventDao {
 
     private boolean isExist(int userId) {
         String sql = "SELECT COUNT(*) FROM USERS WHERE ID = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, Integer.class) > 0;
+            return jdbcTemplate.queryForObject(sql, new Object[]{userId}, Integer.class) > 0;
     }
 }
