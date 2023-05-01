@@ -85,6 +85,6 @@ public class UserController {
     @GetMapping("/{id}/feed")
     @Operation(summary = "Information about all friends actions by personal ID")
     public List<Event> getFeed(@Parameter(description = "Unique user id") @PathVariable int id) {
-        return userService.getFeed(id);
+            return userService.getFeed(id);
     }
 }

@@ -104,14 +104,14 @@ public class UserDbStorage implements UserStorage {
             String sql = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, FRIENDSHIP_STATUS) VALUES (?,?,?)";
             updatedRows = jdbcTemplate.update(sql, userId, friendId, "FALSE");
 
-            Event event = Event.builder()
-                    .timestamp(System.currentTimeMillis())
-                    .userId(userId)
-                    .eventType(FRIEND)
-                    .operation(ADD)
-                    .entityId(friendId)
-                    .build();
-            eventDao.add(event);
+                Event event = Event.builder()
+                        .timestamp(System.currentTimeMillis())
+                        .userId(userId)
+                        .eventType(FRIEND)
+                        .operation(ADD)
+                        .entityId(friendId)
+                        .build();
+                eventDao.add(event);
         }
         if (updatedRows > 0) {
             return true;
