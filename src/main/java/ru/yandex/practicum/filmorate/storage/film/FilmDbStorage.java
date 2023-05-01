@@ -14,14 +14,16 @@ import ru.yandex.practicum.filmorate.storage.event.EventDao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static ru.yandex.practicum.filmorate.enums.FilmStorageSql.*;
 import static ru.yandex.practicum.filmorate.model.enums.EventType.LIKE;
 import static ru.yandex.practicum.filmorate.model.enums.Operation.ADD;
 import static ru.yandex.practicum.filmorate.model.enums.Operation.REMOVE;
-import static ru.yandex.practicum.filmorate.enums.FilmStorageSql.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -147,7 +149,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "INSERT INTO LIKES (FILM_ID, USER_ID) VALUES(?,?)";
         if (jdbcTemplate.update(sql, filmId, userId) > 0) {
             Event event = Event.builder()
-                    .timestamp(LocalDateTime.now())
+                    .timestamp(System.currentTimeMillis())
                     .userId(userId)
                     .eventType(LIKE)
                     .operation(ADD)
@@ -167,7 +169,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "DELETE FROM LIKES WHERE FILM_ID AND USER_ID IN(?,?)";
         if (jdbcTemplate.update(sql, filmId, userId) > 0) {
             Event event = Event.builder()
-                    .timestamp(LocalDateTime.now())
+                    .timestamp(System.currentTimeMillis())
                     .userId(userId)
                     .eventType(LIKE)
                     .operation(REMOVE)

@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -64,14 +65,14 @@ public class UserController {
 
     @DeleteMapping("/{id}/friends/{friendId}")
     @Operation(summary = "Delete user from friends")
-    public boolean deleteFriend(@Parameter(description = "User making the request")@PathVariable int id,
-                                @Parameter(description = "Removable user")@PathVariable int friendId) {
+    public boolean deleteFriend(@Parameter(description = "User making the request") @PathVariable int id,
+                                @Parameter(description = "Removable user") @PathVariable int friendId) {
         return userService.deleteFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     @Operation(summary = "Information about user by personal ID")
-    public List<User> getAllFriends(@Parameter(description = "")@PathVariable int id) {
+    public List<User> getAllFriends(@Parameter(description = "") @PathVariable int id) {
         return userService.getAllFriends(id);
     }
 
@@ -84,7 +85,7 @@ public class UserController {
 
     @GetMapping("/{id}/feed")
     @Operation(summary = "Information about all friends actions by personal ID")
-    public List<Event> getFeed(@Parameter(description = "Unique user id")@PathVariable int id) {
-        return userService.getFeed(id);
+    public List<Event> getFeed(@Parameter(description = "Unique user id") @PathVariable int id) {
+            return userService.getFeed(id);
     }
 }
