@@ -66,6 +66,6 @@ public class EventDaoImpl implements EventDao {
 
     private boolean isExist(int userId) {
         String sql = "SELECT COUNT(*) FROM USERS WHERE ID = ?";
-            return jdbcTemplate.queryForObject(sql, new Object[]{userId}, Integer.class) > 0;
+        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, Integer.class) > 0;
     }
 }
