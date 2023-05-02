@@ -74,7 +74,7 @@ public class FilmService {
     public List<Film> getFilmsByDirector(int directorId, String sortBy) {
         Director validDirector = directorStorage.getById(directorId);
         List<Film> films = storage.getFilmsByDirector(validDirector.getId());
-        switch (sortBy) {
+        switch (sortBy.toLowerCase()) {
             case "year":
                 films.sort(Comparator.comparingInt(f -> f.getReleaseDate().getYear()));
                 return films;
