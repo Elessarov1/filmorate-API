@@ -88,15 +88,16 @@ public class ReviewDbStorage implements ReviewStorage {
         if (rowsUpdated == 0) {
             throw new NotFoundException("No such review in the database");
         }
+        Review updatedReview = get(review.getReviewId());
         Event event = Event.builder()
                 .timestamp(System.currentTimeMillis())
-                .userId(review.getUserId())
+                .userId(updatedReview.getUserId())
                 .eventType(REVIEW)
                 .operation(UPDATE)
-                .entityId(review.getReviewId())
+                .entityId(updatedReview.getReviewId())
                 .build();
         eventDao.add(event);
-        return get(review.getReviewId());
+        return updatedReview;
     }
 
     @Override
