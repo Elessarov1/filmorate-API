@@ -121,4 +121,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> findByRequestedTitleAndDirector(String query) {
         return null;
     }
+
+    @Override
+    public List<Film> getByGenreAndYear(int count, int genreId, int year) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getByGenreOrYear(int count, int genreId, int year) {
+        return null;
+    }
 }

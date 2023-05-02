@@ -54,8 +54,11 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10", required = false) @PathVariable int count) {
-        return filmService.getMostLikedFilms(count);
+    public List<Film> getMostLikedFilms(
+            @RequestParam(defaultValue = "10", required = false) @PathVariable int count,
+            @RequestParam(defaultValue = "0") int genreId,
+            @RequestParam(defaultValue = "0") int year) {
+        return filmService.getMostLikedFilms(count, genreId, year);
     }
 
     @GetMapping("/common")
