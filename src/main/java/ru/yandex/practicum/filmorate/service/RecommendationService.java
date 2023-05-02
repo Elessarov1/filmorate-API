@@ -25,38 +25,24 @@ public class RecommendationService {
         User targetUser = userStorage.get(userId);
         List<User> users = new ArrayList<>(userStorage.getAllUsers());
         users.remove(targetUser);
-        List<Film> allFilms = new ArrayList<>(filmStorage.getAllFilms());
-        List<User> mostSimilarUsers = getMostSimilarUsers(targetUser, users, allFilms);
+        List<User> mostSimilarUsers = getMostSimilarUsers(targetUser, users);
 
         return getRecommendedFilms(targetUser, mostSimilarUsers, filmCount);
     }
 
-    private double calcUserSimilarities(User targetUser, User otherUser, List<Film> allFilms) {
-        double filmFreq = 0;
-        double targetUserFreq = 0;
-        double otherUserFreq = 0;
+    private int calcUserSimilarities(User targetUser, User otherUser) {
         Set<Integer> commonLikes = new HashSet<>(recStorage.getUserLikes(targetUser.getId()));
         commonLikes.retainAll(recStorage.getUserLikes(otherUser.getId()));
 
-        for (Integer filmId : commonLikes) {
-            // can be replaced to filmStorage.get(filmId), but too many DB requests in that case
-            Optional<Film> film = allFilms.stream().filter(f -> f.getId() == filmId).findAny();
-            if (film.isPresent()) {
-                filmFreq += 1;
-                targetUserFreq += 1;
-                otherUserFreq += 1;
-            }
-        }
-        return filmFreq / (Math.sqrt(targetUserFreq) * Math.sqrt(otherUserFreq));
+        return commonLikes.size();
     }
 
     private List<User> getMostSimilarUsers(User targetUser,
-                                           List<User> allUsers,
-                                           List<Film> allFilms) {
+                                           List<User> allUsers) {
         List<User> sortedUsers = new ArrayList<>(allUsers);
         sortedUsers.sort((u1,u2) -> Double.compare(
-                calcUserSimilarities(targetUser, u2, allFilms),
-                calcUserSimilarities(targetUser, u1, allFilms)));
+                calcUserSimilarities(targetUser, u2),
+                calcUserSimilarities(targetUser, u1)));
         return sortedUsers;
     }
 
@@ -67,7 +53,6 @@ public class RecommendationService {
         Set<Integer> targetUserLikes = new HashSet<>(recStorage.getUserLikes(targetuser.getId()));
 
         for (User user : mostSimilarUsers) {
-            // can be optimized somehow to avoid numerous DB requests :)
             for (Integer filmId : recStorage.getUserLikes(user.getId())) {
                 if (!targetUserLikes.contains(filmId)) {
                     Film film = filmStorage.get(filmId);
