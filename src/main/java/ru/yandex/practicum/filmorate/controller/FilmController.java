@@ -25,12 +25,7 @@ public class FilmController {
     @GetMapping
     @Operation(summary = "Information about all films in the database")
     public List<Film> getAllFilms() {
-        try {
             return filmService.getAllFilms();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @GetMapping("/{id}")
@@ -52,18 +47,20 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete film from the database")
+    @Operation(summary = "Delete film from database")
     public boolean deleteFilm(@Parameter(description = "Unique film id") @PathVariable int id) {
         return filmService.deleteFilm(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
+    @Operation(summary = "Like the film from the user")
     public boolean addLike(@Parameter(description = "Liked film") @PathVariable int id,
                            @Parameter(description = "User who liked") @PathVariable int userId) {
         return filmService.addLikeToFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
+    @Operation(summary = "Remove like from film")
     public boolean deleteLike(@Parameter(description = "Unliked film") @PathVariable int id,
                               @Parameter(description = "User who unliked") @PathVariable int userId) {
         return filmService.deleteLike(userId, id);
@@ -78,17 +75,20 @@ public class FilmController {
     }
 
     @GetMapping("/common")
+    @Operation(summary = "Get common films with another user")
     public List<Film> getCommonFilms(@RequestParam long userId, @RequestParam long friendId) {
         return filmService.getCommonFilms(userId, friendId);
     }
 
     @GetMapping("/director/{directorId}")
+    @Operation(summary = "Get films by director ID")
     public List<Film> getByDirector(@PathVariable int directorId,
                                     @RequestParam(defaultValue = "year") String sortBy) {
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
 
     @GetMapping("/search")
+    @Operation(summary = "Find films by director ID or title")
     public List<Film> getByTitleOrDirector(@RequestParam String query, @RequestParam List<String> by) {
         return filmService.getByTitleOrDirector(query, by);
     }
