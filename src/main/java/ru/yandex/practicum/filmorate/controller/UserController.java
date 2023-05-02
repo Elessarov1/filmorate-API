@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -85,6 +86,6 @@ public class UserController {
     @GetMapping("/{id}/feed")
     @Operation(summary = "Information about all friends actions by personal ID")
     public List<Event> getFeed(@Parameter(description = "Unique user id") @PathVariable int id) {
-        return userService.getFeed(id);
+            return userService.getFeed(id);
     }
 }

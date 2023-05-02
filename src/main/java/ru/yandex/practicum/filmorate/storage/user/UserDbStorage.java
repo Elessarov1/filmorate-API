@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.event.EventDao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static ru.yandex.practicum.filmorate.model.enums.EventType.FRIEND;
@@ -104,14 +105,14 @@ public class UserDbStorage implements UserStorage {
             String sql = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, FRIENDSHIP_STATUS) VALUES (?,?,?)";
             updatedRows = jdbcTemplate.update(sql, userId, friendId, "FALSE");
 
-            Event event = Event.builder()
-                    .timestamp(System.currentTimeMillis())
-                    .userId(userId)
-                    .eventType(FRIEND)
-                    .operation(ADD)
-                    .entityId(friendId)
-                    .build();
-            eventDao.add(event);
+                Event event = Event.builder()
+                        .timestamp(System.currentTimeMillis())
+                        .userId(userId)
+                        .eventType(FRIEND)
+                        .operation(ADD)
+                        .entityId(friendId)
+                        .build();
+                eventDao.add(event);
         }
         if (updatedRows > 0) {
             return true;
