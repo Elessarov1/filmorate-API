@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.storage.event.EventDao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static ru.yandex.practicum.filmorate.model.enums.EventType.FRIEND;
