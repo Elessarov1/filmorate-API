@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/mpa")
+@Tag(name = "Age ratings", description = "Methods for working with age ratings")
 public class MpaController {
     private final MpaService mpaService;
 
@@ -21,12 +25,14 @@ public class MpaController {
     }
 
     @GetMapping
+    @Operation(summary = "Information about all age ratings in the database")
     public List<Mpa> getAllMpa() {
         return mpaService.getAllMpa();
     }
 
     @GetMapping("/{id}")
-    public Mpa getMpa(@PathVariable int id) {
+    @Operation(summary = "Information about age rating by personal ID")
+    public Mpa getMpa(@Parameter(description = "Unique age rating id") @PathVariable int id) {
         return mpaService.getMpa(id);
     }
 }

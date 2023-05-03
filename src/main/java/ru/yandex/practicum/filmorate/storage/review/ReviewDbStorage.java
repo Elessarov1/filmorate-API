@@ -6,7 +6,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,15 +16,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static ru.yandex.practicum.filmorate.model.enums.EventType.REVIEW;
+import static ru.yandex.practicum.filmorate.model.enums.Operation.*;
+
 @Repository
 @RequiredArgsConstructor
 public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final EventStorage eventStorage;
+
     private int calculateUseful(int id) {
         String sql = "SELECT SUM(RATING) FROM REVIEW_LIKES WHERE REVIEW_ID = ?";
-        Integer reviewRating = jdbcTemplate.queryForObject(sql, Integer.class, new Object[]{id});
+        Integer reviewRating = jdbcTemplate.queryForObject(sql, Integer.class, id);
         if (reviewRating == null) {
             return 0;
         }
@@ -57,6 +64,15 @@ public class ReviewDbStorage implements ReviewStorage {
                 .usingGeneratedKeyColumns("ID")
                 .executeAndReturnKey(reviewFields);
         review.setReviewId(generatedReviewId.intValue());
+
+        Event event = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId((Integer) reviewFields.get("USER_ID"))
+                .eventType(REVIEW)
+                .operation(ADD)
+                .entityId(review.getReviewId())
+                .build();
+        eventStorage.add(event);
         return review;
     }
 
@@ -72,7 +88,16 @@ public class ReviewDbStorage implements ReviewStorage {
         if (rowsUpdated == 0) {
             throw new NotFoundException("No such review in the database");
         }
-        return get(review.getReviewId());
+        Review updatedReview = get(review.getReviewId());
+        Event event = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId(updatedReview.getUserId())
+                .eventType(REVIEW)
+                .operation(UPDATE)
+                .entityId(updatedReview.getReviewId())
+                .build();
+        eventStorage.add(event);
+        return updatedReview;
     }
 
     @Override
@@ -89,6 +114,15 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public boolean delete(int id) {
+        Review review = get(id);
+        Event event = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId(review.getUserId())
+                .eventType(REVIEW)
+                .operation(REMOVE)
+                .entityId(id)
+                .build();
+        eventStorage.add(event);
         String sql = "DELETE FROM REVIEWS WHERE ID = ?";
         return jdbcTemplate.update(sql, id) > 0;
     }
