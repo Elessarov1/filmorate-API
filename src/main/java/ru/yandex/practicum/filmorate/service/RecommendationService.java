@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -14,16 +15,24 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class RecommendationService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final RecommendationStorage recStorage;
 
+    @Autowired
+    public RecommendationService(
+            @Qualifier("filmDbStorage") FilmStorage filmStorage,
+            @Qualifier("userDbStorage") UserStorage userStorage,
+            RecommendationStorage recStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.recStorage = recStorage;
+    }
+
     public List<Film> getRecommendations(int userId) {
         User targetUser = userStorage.get(userId);
         List<User> users = new ArrayList<>(userStorage.getAllUsers());
-        users.remove(targetUser);
         List<User> mostSimilarUsers = getMostSimilarUsers(targetUser, users);
 
         return getRecommendedFilms(targetUser, mostSimilarUsers);
@@ -38,7 +47,10 @@ public class RecommendationService {
 
     private List<User> getMostSimilarUsers(User targetUser, List<User> allUsers) {
         List<User> sortedUsers = new ArrayList<>(allUsers);
-        sortedUsers.sort((u1,u2) -> Double.compare(
+        if (allUsers.size() == 1) {
+            return sortedUsers;
+        }
+        sortedUsers.sort((u1,u2) -> Integer.compare(
                 calcUserSimilarities(targetUser, u2),
                 calcUserSimilarities(targetUser, u1)));
         return sortedUsers;
