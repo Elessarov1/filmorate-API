@@ -127,13 +127,13 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public boolean deleteLike(int id, int userId) {
-        String sql = "DELETE FROM REVIEW_LIKES WHERE ID = ? AND USER_ID = ? AND RATING = 1";
+        String sql = "DELETE FROM REVIEW_LIKES WHERE REVIEW_ID = ? AND USER_ID = ? AND RATING = 1";
         return jdbcTemplate.update(sql, id, userId) > 0;
     }
 
     @Override
     public boolean deleteDislike(int id, int userId) {
-        String sql = "DELETE FROM REVIEW_LIKES WHERE ID = ? AND USER_ID = ? AND RATING = -1";
+        String sql = "DELETE FROM REVIEW_LIKES WHERE REVIEW_ID = ? AND USER_ID = ? AND RATING = -1";
         return jdbcTemplate.update(sql, id, userId) > 0;
     }
 }
