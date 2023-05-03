@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.event.EventDao;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final EventDao eventDao;
+    private final EventStorage eventStorage;
 
     private int calculateUseful(int id) {
         String sql = "SELECT SUM(RATING) FROM REVIEW_LIKES WHERE REVIEW_ID = ?";
@@ -72,7 +72,7 @@ public class ReviewDbStorage implements ReviewStorage {
                 .operation(ADD)
                 .entityId(review.getReviewId())
                 .build();
-        eventDao.add(event);
+        eventStorage.add(event);
         return review;
     }
 
@@ -96,7 +96,7 @@ public class ReviewDbStorage implements ReviewStorage {
                 .operation(UPDATE)
                 .entityId(updatedReview.getReviewId())
                 .build();
-        eventDao.add(event);
+        eventStorage.add(event);
         return updatedReview;
     }
 
@@ -122,7 +122,7 @@ public class ReviewDbStorage implements ReviewStorage {
                 .operation(REMOVE)
                 .entityId(id)
                 .build();
-        eventDao.add(event);
+        eventStorage.add(event);
         String sql = "DELETE FROM REVIEWS WHERE ID = ?";
         return jdbcTemplate.update(sql, id) > 0;
     }
