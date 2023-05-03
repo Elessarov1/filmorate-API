@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.event.EventDao;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,7 +30,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final EventDao eventDao;
+    private final EventStorage eventStorage;
 
     @Override
     public Film add(Film film) {
@@ -64,7 +64,7 @@ public class FilmDbStorage implements FilmStorage {
         }
         jdbcInsert.withTableName("LIKES")
                 .executeBatch(batchValues.toArray(new Map[batchValues.size()]));
-        return film;
+        return get(key.intValue());
     }
 
     @Override
@@ -153,7 +153,7 @@ public class FilmDbStorage implements FilmStorage {
                     .operation(ADD)
                     .entityId(filmId)
                     .build();
-            eventDao.add(event);
+            eventStorage.add(event);
             return true;
         }
         return false;
@@ -173,7 +173,7 @@ public class FilmDbStorage implements FilmStorage {
                     .operation(REMOVE)
                     .entityId(filmId)
                     .build();
-            eventDao.add(event);
+            eventStorage.add(event);
             return true;
         }
         return false;

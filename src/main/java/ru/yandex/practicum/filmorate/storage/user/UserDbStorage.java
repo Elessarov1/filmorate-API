@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.event.EventDao;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,7 +27,7 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final EventDao eventDao;
+    private final EventStorage eventStorage;
 
     @Override
     public User add(User user) {
@@ -111,7 +111,7 @@ public class UserDbStorage implements UserStorage {
                     .operation(ADD)
                     .entityId(friendId)
                     .build();
-            eventDao.add(event);
+            eventStorage.add(event);
         }
         if (updatedRows > 0) {
             return true;
@@ -121,7 +121,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public boolean deleteFriend(int userId, int friendId) {
-        String sql = "DELETE FROM FRIENDS WHERE USER_ID AND FRIEND_ID IN(?,?)";
+        String sql = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
         Event event = Event.builder()
                 .timestamp(System.currentTimeMillis())
                 .userId(userId)
@@ -129,12 +129,15 @@ public class UserDbStorage implements UserStorage {
                 .operation(REMOVE)
                 .entityId(friendId)
                 .build();
-        eventDao.add(event);
+        eventStorage.add(event);
         return jdbcTemplate.update(sql, userId, friendId) > 0;
     }
 
     @Override
     public List<User> getAllFriends(int id) {
+        if (get(id) == null) {
+            throw new NotFoundException("No such user in the database");
+        }
         String sql = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
         return jdbcTemplate.query(sql, this::mapRowToUser, id);
     }

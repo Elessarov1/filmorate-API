@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.model.enums;
 
 public enum EventType {
     LIKE("LIKE"),
-
     REVIEW("REVIEW"),
     FRIEND("FRIEND");
 
@@ -14,6 +13,8 @@ public enum EventType {
 
     @Override
     public String toString() {
-        return eventType;
+        return "EventType{" +
+                "eventType='" + eventType + '\'' +
+                '}';
     }
 }

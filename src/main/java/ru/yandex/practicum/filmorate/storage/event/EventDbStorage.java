@@ -18,7 +18,7 @@ import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
-public class EventDaoImpl implements EventDao {
+public class EventDbStorage implements EventStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
