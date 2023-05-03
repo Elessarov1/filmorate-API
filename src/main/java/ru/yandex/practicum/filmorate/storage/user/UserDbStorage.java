@@ -135,9 +135,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAllFriends(int id) {
-        if (get(id) == null) {
-            throw new NotFoundException("No such user in the database");
-        }
+        get(id);
         String sql = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
         return jdbcTemplate.query(sql, this::mapRowToUser, id);
     }
