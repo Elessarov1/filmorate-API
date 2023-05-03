@@ -21,13 +21,12 @@ public class RecommendationService {
     private final RecommendationStorage recStorage;
 
     public List<Film> getRecommendations(int userId) {
-        int filmCount = 3;
         User targetUser = userStorage.get(userId);
         List<User> users = new ArrayList<>(userStorage.getAllUsers());
         users.remove(targetUser);
         List<User> mostSimilarUsers = getMostSimilarUsers(targetUser, users);
 
-        return getRecommendedFilms(targetUser, mostSimilarUsers, filmCount);
+        return getRecommendedFilms(targetUser, mostSimilarUsers);
     }
 
     private int calcUserSimilarities(User targetUser, User otherUser) {
@@ -37,8 +36,7 @@ public class RecommendationService {
         return commonLikes.size();
     }
 
-    private List<User> getMostSimilarUsers(User targetUser,
-                                           List<User> allUsers) {
+    private List<User> getMostSimilarUsers(User targetUser, List<User> allUsers) {
         List<User> sortedUsers = new ArrayList<>(allUsers);
         sortedUsers.sort((u1,u2) -> Double.compare(
                 calcUserSimilarities(targetUser, u2),
@@ -46,24 +44,21 @@ public class RecommendationService {
         return sortedUsers;
     }
 
-    private List<Film> getRecommendedFilms(User targetuser,
-                                        List<User> mostSimilarUsers,
-                                        int count) {
-        Map<Film, Integer> filmsLiked = new HashMap<>();
+    private List<Film> getRecommendedFilms(User targetuser, List<User> mostSimilarUsers) {
+        List<Film> recommendedFilms = new ArrayList<>();
         Set<Integer> targetUserLikes = new HashSet<>(recStorage.getUserLikes(targetuser.getId()));
 
         for (User user : mostSimilarUsers) {
             for (Integer filmId : recStorage.getUserLikes(user.getId())) {
                 if (!targetUserLikes.contains(filmId)) {
                     Film film = filmStorage.get(filmId);
-                    filmsLiked.put(film, filmsLiked.getOrDefault(film, 0) + 1);
+                    recommendedFilms.add(film);
                 }
             }
         }
 
-        return filmsLiked.keySet().stream()
-                .sorted((f1, f2) -> Integer.compare(filmsLiked.get(f2), filmsLiked.get(f1)))
-                .limit(count)
+        return recommendedFilms.stream()
+                .sorted(Comparator.comparing(Film::getLikesCount).reversed())
                 .collect(Collectors.toList());
     }
 }
