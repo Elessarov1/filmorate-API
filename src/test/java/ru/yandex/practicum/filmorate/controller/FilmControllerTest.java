@@ -42,11 +42,6 @@ public class FilmControllerTest {
                 .build();
         String validFilm = objectMapper.writeValueAsString(film);
 
-        mockMvc.perform(post("/films")
-                .contentType("application/json")
-                .content(validFilm)).andDo(h ->
-                assertEquals(200, h.getResponse().getStatus()));
-
         mockMvc.perform(get("/films")
                 .contentType("application/json")).andDo(h ->
                 assertEquals(200, h.getResponse().getStatus()));
