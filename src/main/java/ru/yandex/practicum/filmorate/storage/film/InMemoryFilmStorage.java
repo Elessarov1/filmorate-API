@@ -123,11 +123,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getByGenreAndYear(int count, int genreId, int year) {
-        return null;
-    }
-
-    @Override
     public List<Film> getByGenreOrYear(int count, int genreId, int year) {
         return null;
     }
