@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.enums.SearchQueryArgs;
@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,22 +19,13 @@ import static ru.yandex.practicum.filmorate.enums.SearchQueryArgs.DIRECTOR;
 import static ru.yandex.practicum.filmorate.enums.SearchQueryArgs.TITLE;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class FilmService {
+    @Qualifier("filmDbStorage")
     private final FilmStorage storage;
-    private final UserStorage userStorage;
+    @Qualifier("directorDbStorage")
     private final DirectorStorage directorStorage;
-
-    @Autowired
-    public FilmService(
-            @Qualifier("filmDbStorage") FilmStorage storage,
-            @Qualifier("userDbStorage") UserStorage userStorage,
-            @Qualifier("directorDbStorage") DirectorStorage directorStorage
-    ) {
-        this.storage = storage;
-        this.userStorage = userStorage;
-        this.directorStorage = directorStorage;
-    }
 
     public List<Film> getAllFilms() {
         return storage.getAllFilms();

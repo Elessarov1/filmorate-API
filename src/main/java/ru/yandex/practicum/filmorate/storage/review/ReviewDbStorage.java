@@ -22,9 +22,7 @@ import static ru.yandex.practicum.filmorate.model.enums.Operation.*;
 @Repository
 @RequiredArgsConstructor
 public class ReviewDbStorage implements ReviewStorage {
-
     private final JdbcTemplate jdbcTemplate;
-
     private final EventStorage eventStorage;
 
     private int calculateUseful(int id) {

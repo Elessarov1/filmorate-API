@@ -27,9 +27,7 @@ import static ru.yandex.practicum.filmorate.model.enums.Operation.REMOVE;
 @RequiredArgsConstructor
 @Repository
 public class FilmDbStorage implements FilmStorage {
-
     private final JdbcTemplate jdbcTemplate;
-
     private final EventStorage eventStorage;
 
     @Override
