@@ -10,6 +10,6 @@ import lombok.Data;
 @Builder
 @Schema(description = "Genre of film")
 public class Genre {
-    private final int id;
-    private final String name;
+    private int id;
+    private String name;
 }

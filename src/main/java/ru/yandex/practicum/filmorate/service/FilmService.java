@@ -83,10 +83,10 @@ public class FilmService {
         switch (sortBy.toLowerCase()) {
             case "year":
                 films.sort(Comparator.comparingInt(f -> f.getReleaseDate().getYear()));
-                return films;
+                break;
             case "likes":
                 films.sort(Comparator.comparing(Film::getLikesCount));
-                return films;
+                break;
         }
         return films;
     }

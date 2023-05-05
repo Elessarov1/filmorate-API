@@ -51,6 +51,7 @@ public class ReviewService {
     }
 
     public boolean addLike(int id, int userId) {
+        userStorage.get(userId);
         return reviewStorage.addLikeToReview(id, userId);
     }
 
