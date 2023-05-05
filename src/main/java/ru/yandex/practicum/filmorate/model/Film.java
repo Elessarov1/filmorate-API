@@ -18,11 +18,11 @@ import java.util.Set;
 @Schema(description = "Information about film")
 public class Film {
     @Size(min = 1, max = 200)
-    private final String description;
+    private String description;
     @Positive
-    private final int duration;
-    private final LocalDate releaseDate;
-    private final Mpa mpa;
+    private int duration;
+    private LocalDate releaseDate;
+    private Mpa mpa;
     private final Set<Director> directors = new HashSet<>();
     private final Set<Integer> likes = new HashSet<>();
     private final Set<Genre> genres = new HashSet<>();
