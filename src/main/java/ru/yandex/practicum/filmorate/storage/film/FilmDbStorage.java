@@ -22,6 +22,7 @@ import static ru.yandex.practicum.filmorate.enums.FilmStorageSql.*;
 import static ru.yandex.practicum.filmorate.model.enums.EventType.LIKE;
 import static ru.yandex.practicum.filmorate.model.enums.Operation.ADD;
 import static ru.yandex.practicum.filmorate.model.enums.Operation.REMOVE;
+import static ru.yandex.practicum.filmorate.storage.film.FilmDbStorage.FilmStorageSql.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -192,17 +193,44 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findByRequestedDirector(String query) {
-        return jdbcTemplate.query(FIND_BY_REQUESTED_DIRECTOR.getSql(), this::mapRowToFilm, query);
+        String sql = String.join(
+                " ",
+                GET_ALL_FILMS,
+                JOIN_FILM_DIRECTOR,
+                JOIN_DIRECTOR,
+                String.format(WHERE_LCASE, DIRECTOR_NAME),
+                GROUP_BY_ID,
+                ORDER_BY_COUNT_LIKES_DESC
+        );
+        return jdbcTemplate.query(sql, this::mapRowToFilm, query);
     }
 
     @Override
     public List<Film> findByRequestedTitle(String query) {
-        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE.getSql(), this::mapRowToFilm, query);
+        String sql = String.join(
+                " ",
+                GET_ALL_FILMS,
+                String.format(WHERE_LCASE, FILM_NAME),
+                GROUP_BY_ID,
+                ORDER_BY_COUNT_LIKES_DESC
+        );
+        return jdbcTemplate.query(sql, this::mapRowToFilm, query);
     }
 
     @Override
     public List<Film> findByRequestedTitleAndDirector(String query) {
-        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE_AND_DIRECTOR.getSql(), this::mapRowToFilm, query, query);
+        String sql = String.join(
+                " ",
+                GET_ALL_FILMS,
+                String.format(LEFT, JOIN_FILM_DIRECTOR),
+                String.format(LEFT, JOIN_DIRECTOR),
+                String.format(WHERE_LCASE, DIRECTOR_NAME),
+                OR,
+                String.format(LCASE, FILM_NAME),
+                GROUP_BY_ID,
+                ORDER_BY_COUNT_LIKES_DESC
+        );
+        return jdbcTemplate.query(sql, this::mapRowToFilm, query, query);
     }
 
     @Override
@@ -315,5 +343,22 @@ public class FilmDbStorage implements FilmStorage {
         }
         jdbcInsert.withTableName("FILM_DIRECTOR")
                 .executeBatch(batchValues.toArray(new Map[batchValues.size()]));
+    }
+
+    public static class FilmStorageSql {
+        final static String OR = "OR";
+        final static String LEFT = "LEFT %s";
+        final static String FILM_NAME = "f.NAME";
+        final static String DIRECTOR_NAME = "d.DIRECTOR_NAME";
+        final static String GET_ALL_FILMS = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.DURATION, f.RELEASE_DATE, f.MPA_ID, m.NAME AS MPA_NAME, " +
+                "(SELECT COUNT(l.USER_ID) FROM LIKES l WHERE f.ID = l.FILM_ID) countLikes " +
+                "FROM FILM f " +
+                "JOIN MPA m ON f.MPA_ID = m.MPA_ID ";
+        final static String JOIN_FILM_DIRECTOR = "JOIN FILM_DIRECTOR fd ON f.ID = fd.FILM_ID";
+        final static String JOIN_DIRECTOR = "JOIN DIRECTOR d ON d.DIRECTOR_ID = fd.DIRECTOR_ID";
+        final static String LCASE = "LCASE(%s) LIKE CONCAT('%%', ?, '%%')";
+        final static String WHERE_LCASE = String.format("WHERE %s", LCASE);
+        final static String GROUP_BY_ID = "GROUP BY f.ID";
+        final static String ORDER_BY_COUNT_LIKES_DESC = "ORDER BY countLikes DESC";
     }
 }
