@@ -29,7 +29,5 @@ public interface FilmStorage {
 
     List<Film> findByRequestedTitleAndDirector(String query);
 
-    List<Film> getByGenreAndYear(int count, int genreId, int year);
-
     List<Film> getByGenreOrYear(int count, int genreId, int year);
 }

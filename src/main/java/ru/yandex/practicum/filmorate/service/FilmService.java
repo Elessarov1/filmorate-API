@@ -64,9 +64,6 @@ public class FilmService {
                     .limit(count)
                     .collect(Collectors.toList());
         }
-        if ((genreId > 0) && (year > 0)) {
-            return storage.getByGenreAndYear(count, genreId, year);
-        }
         if ((genreId > 0) || (year > 0)) {
             return storage.getByGenreOrYear(count, genreId, year);
         }
