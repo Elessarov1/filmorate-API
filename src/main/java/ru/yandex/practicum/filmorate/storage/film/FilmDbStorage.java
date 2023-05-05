@@ -18,10 +18,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.filmorate.enums.FilmStorageSql.*;
 import static ru.yandex.practicum.filmorate.model.enums.EventType.LIKE;
 import static ru.yandex.practicum.filmorate.model.enums.Operation.ADD;
 import static ru.yandex.practicum.filmorate.model.enums.Operation.REMOVE;
+import static ru.yandex.practicum.filmorate.storage.film.FilmStorageSql.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -190,27 +190,92 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findByRequestedDirector(String query) {
-        return jdbcTemplate.query(FIND_BY_REQUESTED_DIRECTOR.getSql(), this::mapRowToFilm, query);
+        String sql = String.join(
+                " ",
+                GET_ALL_FILMS,
+                JOIN_FILM_DIRECTOR,
+                JOIN_DIRECTOR,
+                WHERE,
+                String.format(LCASE, DIRECTOR_NAME),
+                GROUP_BY_ID,
+                ORDER_BY_COUNT_LIKES_DESC
+        );
+        return jdbcTemplate.query(sql, this::mapRowToFilm, query);
     }
 
     @Override
     public List<Film> findByRequestedTitle(String query) {
-        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE.getSql(), this::mapRowToFilm, query);
+        String sql = String.join(
+                " ",
+                GET_ALL_FILMS,
+                WHERE,
+                String.format(LCASE, FILM_NAME),
+                GROUP_BY_ID,
+                ORDER_BY_COUNT_LIKES_DESC
+        );
+        return jdbcTemplate.query(sql, this::mapRowToFilm, query);
     }
 
     @Override
     public List<Film> findByRequestedTitleAndDirector(String query) {
-        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE_AND_DIRECTOR.getSql(), this::mapRowToFilm, query, query);
-    }
-
-    @Override
-    public List<Film> getByGenreAndYear(int count, int genreId, int year) {
-        return jdbcTemplate.query(GET_BY_GENRE_AND_YEAR.getSql(), this::mapRowToFilm, genreId, year, count);
+        String sql = String.join(
+                " ",
+                GET_ALL_FILMS,
+                String.format(LEFT, JOIN_FILM_DIRECTOR),
+                String.format(LEFT, JOIN_DIRECTOR),
+                WHERE,
+                String.format(LCASE, DIRECTOR_NAME),
+                OR,
+                String.format(LCASE, FILM_NAME),
+                GROUP_BY_ID,
+                ORDER_BY_COUNT_LIKES_DESC
+        );
+        return jdbcTemplate.query(sql, this::mapRowToFilm, query, query);
     }
 
     @Override
     public List<Film> getByGenreOrYear(int count, int genreId, int year) {
-        return jdbcTemplate.query(GET_BY_GENRE_OR_YEAR.getSql(), this::mapRowToFilm, genreId, year, count);
+        String sql = getSqlByGenreOrYear(genreId, year);
+        if (genreId > 0 && year > 0) {
+            return jdbcTemplate.query(sql, this::mapRowToFilm, genreId, year, count);
+        } else if (genreId > 0) {
+            return jdbcTemplate.query(sql, this::mapRowToFilm, genreId, count);
+        } else if (year > 0) {
+            return jdbcTemplate.query(sql, this::mapRowToFilm, year, count);
+        }
+        return Collections.emptyList();
+    }
+
+    private String getSqlByGenreOrYear(int genreId, int year) {
+        String requestCondition = null;
+        if (genreId > 0 && year > 0) {
+            requestCondition = String.join(
+                    " ",
+                    WHERE,
+                    GENRE_ID,
+                    AND,
+                    YEAR);
+        } else if (genreId > 0) {
+            requestCondition = String.join(
+                    " ",
+                    WHERE,
+                    GENRE_ID);
+        } else if (year > 0) {
+            requestCondition = String.join(
+                    " ",
+                    WHERE,
+                    YEAR);
+        }
+        return String.join(
+                " ",
+                GET_ALL_FILMS,
+                JOIN_FILM_GENRE,
+                JOIN_GENRE,
+                requestCondition,
+                GROUP_BY_ID,
+                ORDER_BY_COUNT_LIKES_DESC,
+                LIMIT
+        );
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
