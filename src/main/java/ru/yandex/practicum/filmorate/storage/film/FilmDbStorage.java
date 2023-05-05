@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.filmorate.enums.FilmStorageSql.*;
 import static ru.yandex.practicum.filmorate.model.enums.EventType.LIKE;
 import static ru.yandex.practicum.filmorate.model.enums.Operation.ADD;
 import static ru.yandex.practicum.filmorate.model.enums.Operation.REMOVE;
@@ -29,6 +28,26 @@ import static ru.yandex.practicum.filmorate.model.enums.Operation.REMOVE;
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final EventStorage eventStorage;
+    private final String or = "OR";
+    private final String and = "AND";
+    private final String where = "WHERE";
+    private final String limit = "LIMIT ?";
+    private final String genreId = "fg.GENRE_ID = ?";
+    private final String year = "YEAR(RELEASE_DATE) = ?";
+    private final String left = "LEFT %s";
+    private final String filmName = "f.NAME";
+    private final String directorName = "d.DIRECTOR_NAME";
+    private final String getAllFilms = "SELECT f.ID, f.NAME, f.DESCRIPTION, f.DURATION, f.RELEASE_DATE, f.MPA_ID, m.NAME AS MPA_NAME, " +
+            "(SELECT COUNT(l.USER_ID) FROM LIKES l WHERE f.ID = l.FILM_ID) countLikes " +
+            "FROM FILM f " +
+            "JOIN MPA m ON f.MPA_ID = m.MPA_ID ";
+    private final String joinFilmDirector = "JOIN FILM_DIRECTOR fd ON f.ID = fd.FILM_ID";
+    private final String joinDirector = "JOIN DIRECTOR d ON d.DIRECTOR_ID = fd.DIRECTOR_ID";
+    private final String joinFilmGenre = "JOIN FILM_GENRE fg ON f.ID = fg.FILM_ID";
+    private final String joinGenre = "JOIN GENRE g ON g.GENRE_ID = fg.GENRE_ID";
+    private final String lcase = "LCASE(%s) LIKE CONCAT('%%', ?, '%%')";
+    private final String groupById = "GROUP BY f.ID";
+    private final String orderByCountLikesDesc = "ORDER BY countLikes DESC";
 
     @Override
     public Film add(Film film) {
@@ -190,27 +209,92 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findByRequestedDirector(String query) {
-        return jdbcTemplate.query(FIND_BY_REQUESTED_DIRECTOR.getSql(), this::mapRowToFilm, query);
+        String sql = String.join(
+                " ",
+                getAllFilms,
+                joinFilmDirector,
+                joinDirector,
+                where,
+                String.format(lcase, directorName),
+                groupById,
+                orderByCountLikesDesc
+        );
+        return jdbcTemplate.query(sql, this::mapRowToFilm, query);
     }
 
     @Override
     public List<Film> findByRequestedTitle(String query) {
-        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE.getSql(), this::mapRowToFilm, query);
+        String sql = String.join(
+                " ",
+                getAllFilms,
+                where,
+                String.format(lcase, filmName),
+                groupById,
+                orderByCountLikesDesc
+        );
+        return jdbcTemplate.query(sql, this::mapRowToFilm, query);
     }
 
     @Override
     public List<Film> findByRequestedTitleAndDirector(String query) {
-        return jdbcTemplate.query(FIND_BY_REQUESTED_TITLE_AND_DIRECTOR.getSql(), this::mapRowToFilm, query, query);
-    }
-
-    @Override
-    public List<Film> getByGenreAndYear(int count, int genreId, int year) {
-        return jdbcTemplate.query(GET_BY_GENRE_AND_YEAR.getSql(), this::mapRowToFilm, genreId, year, count);
+        String sql = String.join(
+                " ",
+                getAllFilms,
+                String.format(left, joinFilmDirector),
+                String.format(left, joinDirector),
+                where,
+                String.format(lcase, directorName),
+                or,
+                String.format(lcase, filmName),
+                groupById,
+                orderByCountLikesDesc
+        );
+        return jdbcTemplate.query(sql, this::mapRowToFilm, query, query);
     }
 
     @Override
     public List<Film> getByGenreOrYear(int count, int genreId, int year) {
-        return jdbcTemplate.query(GET_BY_GENRE_OR_YEAR.getSql(), this::mapRowToFilm, genreId, year, count);
+        String sql = getSqlByGenreOrYear(genreId, year);
+        if (genreId > 0 && year > 0) {
+            return jdbcTemplate.query(sql, this::mapRowToFilm, genreId, year, count);
+        } else if (genreId > 0) {
+            return jdbcTemplate.query(sql, this::mapRowToFilm, genreId, count);
+        } else if (year > 0) {
+            return jdbcTemplate.query(sql, this::mapRowToFilm, year, count);
+        }
+        return Collections.emptyList();
+    }
+
+    private String getSqlByGenreOrYear(int genreId, int year) {
+        String requestCondition = null;
+        if (genreId > 0 && year > 0) {
+            requestCondition = String.join(
+                    " ",
+                    where,
+                    this.genreId,
+                    and,
+                    this.year);
+        } else if (genreId > 0) {
+            requestCondition = String.join(
+                    " ",
+                    where,
+                    this.genreId);
+        } else if (year > 0) {
+            requestCondition = String.join(
+                    " ",
+                    where,
+                    this.year);
+        }
+        return String.join(
+                " ",
+                getAllFilms,
+                joinFilmGenre,
+                joinGenre,
+                requestCondition,
+                groupById,
+                orderByCountLikesDesc,
+                limit
+        );
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
