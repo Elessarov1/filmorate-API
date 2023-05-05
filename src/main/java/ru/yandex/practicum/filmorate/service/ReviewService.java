@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -13,22 +13,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
-
     private final ReviewStorage reviewStorage;
-
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
-
+    @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
-
-    @Autowired
-    public ReviewService(ReviewStorage reviewStorage,
-                         @Qualifier("userDbStorage") UserStorage userStorage,
-                         @Qualifier("filmDbStorage") FilmStorage filmStorage) {
-        this.reviewStorage = reviewStorage;
-        this.userStorage = userStorage;
-        this.filmStorage = filmStorage;
-    }
 
     public Review addReview(Review review) {
         userStorage.get(review.getUserId());

@@ -24,9 +24,7 @@ import static ru.yandex.practicum.filmorate.model.enums.Operation.REMOVE;
 @Repository
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
-
     private final JdbcTemplate jdbcTemplate;
-
     private final EventStorage eventStorage;
 
     @Override

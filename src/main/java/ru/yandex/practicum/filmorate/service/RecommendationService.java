@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -14,21 +14,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class RecommendationService {
+    @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
     private final RecommendationStorage recStorage;
-
-    @Autowired
-    public RecommendationService(
-            @Qualifier("filmDbStorage") FilmStorage filmStorage,
-            @Qualifier("userDbStorage") UserStorage userStorage,
-            RecommendationStorage recStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-        this.recStorage = recStorage;
-    }
 
     public List<Film> getRecommendations(int userId) {
         User targetUser = userStorage.get(userId);

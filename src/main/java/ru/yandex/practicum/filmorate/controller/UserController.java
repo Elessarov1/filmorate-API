@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -17,17 +17,12 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 @Tag(name = "Users", description = "Methods for working with users")
 public class UserController {
     private final UserService userService;
     private final RecommendationService recService;
-
-    @Autowired
-    public UserController(UserService userService, RecommendationService recService) {
-        this.userService = userService;
-        this.recService = recService;
-    }
 
     @GetMapping
     @Operation(summary = "Information about all users in the database")

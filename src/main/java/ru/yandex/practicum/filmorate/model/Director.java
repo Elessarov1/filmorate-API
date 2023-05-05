@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @Schema(description = "Information about film directors")
 public class Director {
-    int id;
+    private int id;
     @NotBlank
-    String name;
+    private String name;
 }

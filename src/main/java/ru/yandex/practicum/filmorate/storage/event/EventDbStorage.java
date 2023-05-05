@@ -19,7 +19,6 @@ import java.util.Map;
 @Repository
 @RequiredArgsConstructor
 public class EventDbStorage implements EventStorage {
-
     private final JdbcTemplate jdbcTemplate;
 
     @Override
