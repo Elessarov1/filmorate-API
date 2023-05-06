@@ -4,7 +4,7 @@ Template repository for Filmorate project.
 
 ## Swagger UI
 
-For more details you can go [here](localhost:8080/swagger-ui.html) when the app is started
+For more details you can go **localhost:8080/swagger-ui.html** when the app was started
 and explore API from your browser
 
 ![](swagger.png)
@@ -18,18 +18,43 @@ and explore API from your browser
 ### User:
 
 + Get all users
-+ Get user by ID
++ Get user by id
++ Remove user by id
 + Get users friends
++ Add user to friends
++ Remove user from friends
 + Get common friends
 + Check friendship status
 
 ### Film:
 
 + Get all films
-+ Get film by ID
-+ Get film genre
++ Add film
++ Get film by id
++ Remove film by id
++ Get film genres
 + Get most popular films
 + Get film likes
+
+### Review
++ Add review to film
++ Add like to review
++ Remove like from review
++ Get review by user id
++ Get all review
++ Get reviews by film id
++ Remove review by id
+
+### Director
++ Get all films by director id
++ Get all directors
++ Get director by film id
+
+### Events
++ Get all events
++ Get events by user id
++ Get events by entity id
++ Get events by event_type id
 
 ## Examples
 
