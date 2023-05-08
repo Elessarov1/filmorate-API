@@ -80,6 +80,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getFilmsByDirector(int directorId) {
+        return null;
+    }
+
+    @Override
     public List<Film> getAllFilms() {
         return new ArrayList<>(films.values());
     }
@@ -95,5 +100,30 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         film.setId(filmId++);
         log.info("Validation successful");
+    }
+
+    @Override
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> findByRequestedDirector(String query) {
+        return null;
+    }
+
+    @Override
+    public List<Film> findByRequestedTitle(String query) {
+        return null;
+    }
+
+    @Override
+    public List<Film> findByRequestedTitleAndDirector(String query) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getByGenreOrYear(int count, int genreId, int year) {
+        return null;
     }
 }

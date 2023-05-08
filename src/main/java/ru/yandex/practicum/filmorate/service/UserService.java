@@ -1,21 +1,23 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class UserService {
+    @Qualifier("userDbStorage")
     private final UserStorage storage;
-
-    @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage storage) {
-        this.storage = storage;
-    }
+    private final EventStorage eventStorage;
 
     public List<User> getAllUsers() {
         return storage.getAllUsers();
@@ -51,5 +53,9 @@ public class UserService {
 
     public List<User> getCommonFriends(int userId, int otherId) {
         return storage.getCommonFriends(userId, otherId);
+    }
+
+    public List<Event> getFeed(int userId) {
+        return eventStorage.getFeed(userId);
     }
 }

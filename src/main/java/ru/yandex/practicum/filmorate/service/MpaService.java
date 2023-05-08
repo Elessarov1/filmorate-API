@@ -10,7 +10,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MpaService {
-
     private final MpaStorage storage;
 
     public List<Mpa> getAllMpa() {

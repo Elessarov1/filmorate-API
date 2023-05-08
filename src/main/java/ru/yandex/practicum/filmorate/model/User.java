@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,14 +13,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@AllArgsConstructor
 @Builder
+@Schema(description = "Information about user")
 public class User {
     @NotBlank
-    private final String login;
+    private String login;
     @Email
-    private final String email;
+    private String email;
     @PastOrPresent
-    private final LocalDate birthday;
+    private LocalDate birthday;
     private final Set<Integer> friends = new HashSet<>();
     private int id;
     private String name;

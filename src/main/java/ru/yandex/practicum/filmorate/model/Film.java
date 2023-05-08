@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,13 +15,15 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
+@Schema(description = "Information about film")
 public class Film {
     @Size(min = 1, max = 200)
-    private final String description;
+    private String description;
     @Positive
-    private final int duration;
-    private final LocalDate releaseDate;
-    private final Mpa mpa;
+    private int duration;
+    private LocalDate releaseDate;
+    private Mpa mpa;
+    private final Set<Director> directors = new HashSet<>();
     private final Set<Integer> likes = new HashSet<>();
     private final Set<Genre> genres = new HashSet<>();
     private int id;
@@ -42,5 +45,4 @@ public class Film {
     public int getLikesCount() {
         return likes.size();
     }
-
 }

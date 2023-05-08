@@ -8,18 +8,24 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import static ru.yandex.practicum.filmorate.model.enums.EventType.FRIEND;
+import static ru.yandex.practicum.filmorate.model.enums.Operation.ADD;
+import static ru.yandex.practicum.filmorate.model.enums.Operation.REMOVE;
+
 @Repository
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
-
     private final JdbcTemplate jdbcTemplate;
+    private final EventStorage eventStorage;
 
     @Override
     public User add(User user) {
@@ -90,11 +96,20 @@ public class UserDbStorage implements UserStorage {
     public boolean addFriend(int userId, int friendId) {
         int updatedRows = 0;
         if (friendCheck(userId, friendId)) {
-            String sql = "UPDATE FRIENDS SET FRIENDSHIP = ? WHERE USER_ID = ? AND FRIEND_ID = ?";
+            String sql = "UPDATE FRIENDS SET FRIENDSHIP_STATUS = ? WHERE USER_ID = ? AND FRIEND_ID = ?";
             updatedRows = jdbcTemplate.update(sql, "TRUE", userId, friendId);
         } else {
             String sql = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID, FRIENDSHIP_STATUS) VALUES (?,?,?)";
             updatedRows = jdbcTemplate.update(sql, userId, friendId, "FALSE");
+
+            Event event = Event.builder()
+                    .timestamp(System.currentTimeMillis())
+                    .userId(userId)
+                    .eventType(FRIEND)
+                    .operation(ADD)
+                    .entityId(friendId)
+                    .build();
+            eventStorage.add(event);
         }
         if (updatedRows > 0) {
             return true;
@@ -104,12 +119,21 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public boolean deleteFriend(int userId, int friendId) {
-        String sql = "DELETE FROM FRIENDS WHERE USER_ID AND FRIEND_ID IN(?,?)";
+        String sql = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
+        Event event = Event.builder()
+                .timestamp(System.currentTimeMillis())
+                .userId(userId)
+                .eventType(FRIEND)
+                .operation(REMOVE)
+                .entityId(friendId)
+                .build();
+        eventStorage.add(event);
         return jdbcTemplate.update(sql, userId, friendId) > 0;
     }
 
     @Override
     public List<User> getAllFriends(int id) {
+        get(id);
         String sql = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
         return jdbcTemplate.query(sql, this::mapRowToUser, id);
     }

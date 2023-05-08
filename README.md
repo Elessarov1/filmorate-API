@@ -1,30 +1,72 @@
-# java-filmorate
+# Java-filmorate
+
 Template repository for Filmorate project.
 
+## Swagger UI
+
+For more details you can go **localhost:8080/swagger-ui.html** when the app was started
+and explore API from your browser
+
+![](swagger.png)
+
 ## Database diagram
+
 ![](schema.png)
+
 ## What can we get from database:
+
 ### User:
+
 + Get all users
-+ Get user by ID
++ Get user by id
++ Remove user by id
 + Get users friends
++ Add user to friends
++ Remove user from friends
 + Get common friends
 + Check friendship status
+
 ### Film:
+
 + Get all films
-+ Get film by ID
-+ Get film genre
++ Add film
++ Get film by id
++ Remove film by id
++ Get film genres
 + Get most popular films
 + Get film likes
 
+### Review
++ Add review to film
++ Add like to review
++ Remove like from review
++ Get review by user id
++ Get all review
++ Get reviews by film id
++ Remove review by id
+
+### Director
++ Get all films by director id
++ Get all directors
++ Get director by film id
+
+### Events
++ Get all events
++ Get events by user id
++ Get events by entity id
++ Get events by event_type id
+
 ## Examples
+
 Get user friends
+
 ```postgres-psql
 SELECT * FROM USERS 
 WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)
  ```
 
 Get genres by film id
+
 ```postgres-psql
 SELECT * FROM GENRE 
 WHERE GENRE_ID IN 
@@ -32,6 +74,7 @@ WHERE GENRE_ID IN
  ```
 
 Get films of concrete genre
+
 ```postgres-psql
 SELECT * FROM FILMS f
 JOIN FILM_GENRE fg ON f.ID = fg.FILM_ID
