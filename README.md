@@ -4,7 +4,7 @@ Template repository for Filmorate project.
 
 ## Swagger UI
 
-For more details you can go **localhost:8080/swagger-ui.html** when the app was started
+For more details you can go on **localhost:8080/swagger-ui.html** when the app has been started
 and explore API from your browser
 
 ![](swagger.png)
@@ -13,7 +13,7 @@ and explore API from your browser
 
 ![](schema.png)
 
-## What can we get from database:
+## What can we get from this database:
 
 ### User:
 
