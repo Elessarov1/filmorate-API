@@ -1,6 +1,13 @@
-# Filmorate API
+ <h1 align="center">Filmorate API</h1>
 
-A group project implemented as a monolithic application. It is a service for rating and recommending films between users.
+<div align="center">
+  <a>
+    <img src="icon.png" alt="Logo" width="80" height="80">
+  </a>
+</div>
+
+<h4>A group project implemented as a monolithic application. 
+It is a service for rating and recommending films between users.</h4>
 
 ## Swagger UI
 
