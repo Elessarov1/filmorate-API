@@ -1,6 +1,6 @@
-# Java-filmorate
+# Filmorate API
 
-Template repository for Filmorate project.
+A group project implemented as a monolithic application. It is a service for rating and recommending films between users.
 
 ## Swagger UI
 
